@@ -109,10 +109,12 @@
 //!
 
 pub mod errors;
+pub mod map_x;
 pub mod oks;
 pub mod onerr;
 pub mod onok;
 pub mod prelude;
 pub mod unwrap;
+pub mod while_ok;
 mod util;
 
