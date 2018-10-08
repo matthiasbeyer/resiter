@@ -4,7 +4,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
 
-/// Extension trait for `Iterator<Item = Result<O, E>>` to iter until an error is encountered.
+/// Extension trait for `Iterator<Item = Result<O, E>>` to selectively transform Oks and Errors.
 pub trait MapX<O, E> : Sized
 {
     fn map_ok<F, O2>(self, F) -> MapOk<Self, F>
