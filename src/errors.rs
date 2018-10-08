@@ -4,47 +4,24 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
 
+use std::iter::*;
+
 use util::*;
 
-#[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
-pub struct Errors<T>(Box<Iterator<Item = T>>);
+pub use util::Process as Errors;
+// for backward compatibility with previous implementation
 
 /// Extension trait for `Iterator<Item = Result<T, E>>` to get all `E`s
-pub trait GetErrors<T> {
-    fn errors(self) -> Errors<T>;
+pub trait GetErrors<T, E> : Sized {
+    fn errors(self) -> FilterMap<Self, fn(Result<T,E>) -> Option<E>>;
 }
 
-impl<T, U, I> GetErrors<T> for I
-    where I: Iterator<Item = Result<U, T>> + 'static,
-          T: 'static,
-          U: 'static
+impl<T, E, I> GetErrors<T, E> for I
+    where I: Iterator<Item = Result<T, E>> + Sized
 {
-    fn errors(self) -> Errors<T> {
-        let bx : Box<Iterator<Item = T>> = Box::new(self.filter_map(GetErr::get_err));
-        Errors(bx)
+    fn errors(self) -> FilterMap<Self, fn(Result<T,E>) -> Option<E>> {
+        self.filter_map(GetErr::get_err)
     }
-}
-
-impl<T> Iterator for Errors<T> {
-    type Item = T;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.0.next()
-    }
-}
-
-impl<T> Errors<T> {
-
-    /// Process all errors with a lambda
-    pub fn process<R: Default, E, F>(self, f: F) -> Result<R, E>
-        where F: Fn(T) -> Result<R, E>
-    {
-        for element in self {
-            let _ = f(element)?;
-        }
-        Ok(R::default())
-    }
-
 }
 
 #[test]
