@@ -136,6 +136,40 @@
 //! # }
 //! ```
 //!
+//! * Filtering oks (leaving errors as is)
+//!
+//! ```
+//! # fn main() {
+//! use std::str::FromStr;
+//! use resiter::filter_x::*;
+//!
+//! let doubles = ["1", "2", "foo", "4", "5"]
+//!     .into_iter()
+//!     .map(|e| usize::from_str(e))
+//!     .filter_ok(|i| i%2 == 0)
+//!     .collect::<Vec<_>>();
+//! assert_eq!(doubles.len(), 3);
+//! assert_eq!(doubles[0], Ok(2));
+//! # }
+//! ```
+//!
+//! * Filtering errors (leaving oks as is)
+//!
+//! ```
+//! # fn main() {
+//! use std::str::FromStr;
+//! use resiter::filter_x::*;
+//!
+//! let doubles = ["1", "2", "foo", "4", "5"]
+//!     .into_iter()
+//!     .map(|e| usize::from_str(e))
+//!     .filter_err(|_| false) // filter out all errors
+//!     .collect::<Vec<_>>();
+//! assert_eq!(doubles.len(), 4);
+//! assert_eq!(doubles[2], Ok(4));
+//! # }
+//! ```
+//!
 //! * Stopping the iteration on the first error
 //!
 //! ```
@@ -161,6 +195,7 @@
 //!
 
 pub mod errors;
+pub mod filter_x;
 pub mod map_x;
 pub mod oks;
 pub mod onerr;
