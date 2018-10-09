@@ -103,16 +103,104 @@
 //! # }
 //! ```
 //!
+//! * Transforming oks
+//!
+//! ```
+//! # fn main() {
+//! use std::str::FromStr;
+//! use resiter::map_x::*;
+//!
+//! let doubles = ["1", "2", "foo", "4", "5"]
+//!     .into_iter()
+//!     .map(|e| usize::from_str(e))
+//!     .map_ok(|i| 2*i)
+//!     .collect::<Vec<_>>();
+//! assert_eq!(doubles[0], Ok(2));
+//! assert_eq!(doubles[1], Ok(4));
+//! # }
+//! ```
+//!
+//! * Transforming errors
+//!
+//! ```
+//! # fn main() {
+//! use std::str::FromStr;
+//! use resiter::map_x::*;
+//!
+//! let doubles = ["1", "2", "foo", "4", "5"]
+//!     .into_iter()
+//!     .map(|e| usize::from_str(e))
+//!     .map_err(|e| format!("{:?}", e))
+//!     .collect::<Vec<_>>();
+//! assert_eq!(doubles[2], Err("ParseIntError { kind: InvalidDigit }".to_string()));
+//! # }
+//! ```
+//!
+//! * Filtering oks (leaving errors as is)
+//!
+//! ```
+//! # fn main() {
+//! use std::str::FromStr;
+//! use resiter::filter_x::*;
+//!
+//! let doubles = ["1", "2", "foo", "4", "5"]
+//!     .into_iter()
+//!     .map(|e| usize::from_str(e))
+//!     .filter_ok(|i| i%2 == 0)
+//!     .collect::<Vec<_>>();
+//! assert_eq!(doubles.len(), 3);
+//! assert_eq!(doubles[0], Ok(2));
+//! # }
+//! ```
+//!
+//! * Filtering errors (leaving oks as is)
+//!
+//! ```
+//! # fn main() {
+//! use std::str::FromStr;
+//! use resiter::filter_x::*;
+//!
+//! let doubles = ["1", "2", "foo", "4", "5"]
+//!     .into_iter()
+//!     .map(|e| usize::from_str(e))
+//!     .filter_err(|_| false) // filter out all errors
+//!     .collect::<Vec<_>>();
+//! assert_eq!(doubles.len(), 4);
+//! assert_eq!(doubles[2], Ok(4));
+//! # }
+//! ```
+//!
+//! * Stopping the iteration on the first error
+//!
+//! ```
+//! # fn main() -> () {
+//! use std::str::FromStr;
+//! use resiter::while_ok::*;
+//!
+//! let res = ["1", "2", "foo", "4", "5"]
+//!     .into_iter()
+//!     .map(|e| usize::from_str(e))
+//!     .while_ok(|i| {
+//!         println!("{} is a usize", i);
+//!     });
+//! if res.is_err() {
+//!     println!("An error occured");
+//! }
+//! # }
+//! ```
+//!
 //! # License
 //!
 //! MPL 2.0
 //!
 
 pub mod errors;
+pub mod filter_x;
+pub mod map_x;
 pub mod oks;
 pub mod onerr;
 pub mod onok;
 pub mod prelude;
 pub mod unwrap;
 mod util;
-
+pub mod while_ok;
