@@ -4,48 +4,27 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
 
+use std::iter::*;
+
 use util::*;
 
-#[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
-pub struct Oks<T>(Box<Iterator<Item = T>>);
+pub use util::Process as Oks;
+// for backward compatibility with previous implementation
+
 
 /// Extension trait for `Iterator<Item = Result<T, E>>` to get all `T`s
-pub trait GetOks<T> {
-    fn oks(self) -> Oks<T>;
+pub trait GetOks<T, E> : Sized {
+    fn oks(self) -> FilterMap<Self, fn(Result<T,E>) -> Option<T>>;
 }
 
-impl<T, E, I> GetOks<T> for I
-    where I: Iterator<Item = Result<T, E>> + 'static,
-          T: 'static,
-          E: 'static
+impl<T, E, I> GetOks<T, E> for I
+    where I: Iterator<Item = Result<T, E>> + Sized
 {
-    fn oks(self) -> Oks<T> {
-        let bx : Box<Iterator<Item = T>> = Box::new(self.filter_map(GetOk::get_ok));
-        Oks(bx)
+    fn oks(self) -> FilterMap<Self, fn(Result<T,E>) -> Option<T>> {
+        self.filter_map(GetOk::get_ok)
     }
 }
 
-impl<T> Iterator for Oks<T> {
-    type Item = T;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.0.next()
-    }
-}
-
-impl<T> Oks<T> {
-
-    /// Process all errors with a lambda
-    pub fn process<R: Default, E, F>(self, f: F) -> Result<R, E>
-        where F: Fn(T) -> Result<R, E>
-    {
-        for element in self {
-            let _ = f(element)?;
-        }
-        Ok(R::default())
-    }
-
-}
 
 #[test]
 fn test_compile() {
@@ -55,7 +34,5 @@ fn test_compile() {
         .into_iter()
         .map(|e| usize::from_str(e))
         .oks()
-        .process(|e| { println!("Error: {:?}", e); Ok(()) });
+        .process(|o| { println!("Ok: {:?}", o); Ok(()) });
 }
-
-
