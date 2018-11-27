@@ -196,6 +196,7 @@
 
 pub mod errors;
 pub mod filter_x;
+pub mod flat_map_x;
 pub mod map_x;
 pub mod oks;
 pub mod onerr;
