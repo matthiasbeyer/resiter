@@ -194,6 +194,7 @@
 //! MPL 2.0
 //!
 
+pub mod and_then_x;
 pub mod errors;
 pub mod filter_map_x;
 pub mod filter_x;
