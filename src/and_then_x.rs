@@ -6,27 +6,27 @@
 
 /// Extension trait for `Iterator<Item = Result<O, E>>` to selectively transform Oks and Errors.
 pub trait AndThenX<O, E>: Sized {
-    fn and_then_ok<F>(self, F) -> AndThenOk<Self, F>
+    fn and_then_ok<F, O2>(self, F) -> AndThenOk<Self, F>
     where
-        F: FnMut(O) -> Result<O, E>;
-    fn and_then_err<F>(self, F) -> AndThenErr<Self, F>
+        F: FnMut(O) -> Result<O2, E>;
+    fn and_then_err<F, E2>(self, F) -> AndThenErr<Self, F>
     where
-        F: FnMut(E) -> Result<O, E>;
+        F: FnMut(E) -> Result<O, E2>;
 }
 
 impl<I, O, E> AndThenX<O, E> for I
 where
     I: Iterator<Item = Result<O, E>> + Sized,
 {
-    fn and_then_ok<F>(self, f: F) -> AndThenOk<Self, F>
+    fn and_then_ok<F, O2>(self, f: F) -> AndThenOk<Self, F>
     where
-        F: FnMut(O) -> Result<O, E>,
+        F: FnMut(O) -> Result<O2, E>,
     {
         AndThenOk { iter: self, f }
     }
-    fn and_then_err<F>(self, f: F) -> AndThenErr<Self, F>
+    fn and_then_err<F, E2>(self, f: F) -> AndThenErr<Self, F>
     where
-        F: FnMut(E) -> Result<O, E>,
+        F: FnMut(E) -> Result<O, E2>,
     {
         AndThenErr { iter: self, f }
     }
@@ -38,17 +38,18 @@ pub struct AndThenOk<I, F> {
     f: F,
 }
 
-impl<I, O, E, F> Iterator for AndThenOk<I, F>
+impl<I, O, E, O2, F> Iterator for AndThenOk<I, F>
 where
     I: Iterator<Item = Result<O, E>>,
-    F: FnMut(O) -> Result<O, E>,
+    F: FnMut(O) -> Result<O2, E>,
 {
-    type Item = Result<O, E>;
+    type Item = Result<O2, E>;
 
     fn next(&mut self) -> Option<Self::Item> {
         match self.iter.next() {
             Some(Ok(o)) => Some((self.f)(o)),
-            other => other,
+            Some(Err(e)) => Some(Err(e)),
+            None => None,
         }
     }
 
@@ -64,17 +65,18 @@ pub struct AndThenErr<I, F> {
     f: F,
 }
 
-impl<I, O, E, F> Iterator for AndThenErr<I, F>
+impl<I, O, E, E2, F> Iterator for AndThenErr<I, F>
 where
     I: Iterator<Item = Result<O, E>>,
-    F: FnMut(E) -> Result<O, E>,
+    F: FnMut(E) -> Result<O, E2>,
 {
-    type Item = Result<O, E>;
+    type Item = Result<O, E2>;
 
     fn next(&mut self) -> Option<Self::Item> {
         match self.iter.next() {
             Some(Err(e)) => Some((self.f)(e)),
-            other => other,
+            Some(Ok(o)) => Some(Ok(o)),
+            None => None,
         }
     }
 
@@ -88,16 +90,17 @@ where
 fn test_and_then_ok() {
     use std::str::FromStr;
 
-    let mapped: Vec<_> = ["1", "2", "a", "4", "5"]
+    let mapped: Vec<_> = ["1", "2", "a", "b", "4", "5"]
         .into_iter()
-        .map(|txt| usize::from_str(txt))
+        .map(|txt| usize::from_str(txt).map_err(|e| (txt, e)))
         .and_then_ok(|i| Ok(2 * i))
-        .and_then_err(|i| Ok(15))
+        .and_then_err(|(txt, e)| if txt == &"a" { Ok(15) } else { Err(e) })
         .collect();
 
     assert_eq!(mapped[0], Ok(2));
     assert_eq!(mapped[1], Ok(4));
     assert_eq!(mapped[2], Ok(15));
-    assert_eq!(mapped[3], Ok(8));
-    assert_eq!(mapped[4], Ok(10));
+    assert!(mapped[3].is_err());
+    assert_eq!(mapped[4], Ok(8));
+    assert_eq!(mapped[5], Ok(10));
 }
