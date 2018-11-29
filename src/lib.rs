@@ -208,3 +208,17 @@ pub mod prelude;
 pub mod unwrap;
 mod util;
 pub mod while_ok;
+
+pub use and_then_x::AndThenX;
+pub use errors::GetErrors;
+pub use filter_map_x::FilterMapX;
+pub use filter_x::FilterX;
+pub use flat_map_x::FlatMapX;
+pub use flatten_x::FlattenX;
+pub use map_x::MapX;
+pub use oks::GetOks;
+pub use onerr::OnErrDo;
+pub use onok::OnOkDo;
+pub use unwrap::UnwrapWithExt;
+pub use util::{GetErr, GetOk, Process};
+pub use while_ok::WhileOk;
