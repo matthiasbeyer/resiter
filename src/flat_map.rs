@@ -5,51 +5,59 @@
 //
 
 /// Extension trait for `Iterator<Item = Result<O, E>>` to selectively transform Oks and Errors.
-pub trait FlattenX<O, E>: Sized {
-    fn flatten_ok<U, O2>(self) -> FlattenOk<Self, U>
+pub trait FlatMap<O, E>: Sized {
+    fn flat_map_ok<U, F, O2>(self, F) -> FlatMapOk<Self, U, F>
     where
+        F: FnMut(O) -> U,
         U: IntoIterator<Item = O2>;
-    fn flatten_err<U, E2>(self) -> FlattenErr<Self, U>
+    fn flat_map_err<U, F, E2>(self, F) -> FlatMapErr<Self, U, F>
     where
+        F: FnMut(E) -> U,
         U: IntoIterator<Item = E2>;
 }
 
-impl<I, O, E> FlattenX<O, E> for I
+impl<I, O, E> FlatMap<O, E> for I
 where
     I: Iterator<Item = Result<O, E>> + Sized,
 {
-    fn flatten_ok<U, O2>(self) -> FlattenOk<Self, U>
+    fn flat_map_ok<U, F, O2>(self, f: F) -> FlatMapOk<Self, U, F>
     where
+        F: FnMut(O) -> U,
         U: IntoIterator<Item = O2>,
     {
-        FlattenOk {
+        FlatMapOk {
             frontiter: None,
             iter: self,
+            f,
         }
     }
-    fn flatten_err<U, E2>(self) -> FlattenErr<Self, U>
+    fn flat_map_err<U, F, E2>(self, f: F) -> FlatMapErr<Self, U, F>
     where
+        F: FnMut(E) -> U,
         U: IntoIterator<Item = E2>,
     {
-        FlattenErr {
+        FlatMapErr {
             frontiter: None,
             iter: self,
+            f,
         }
     }
 }
 
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
-pub struct FlattenOk<I, U>
+pub struct FlatMapOk<I, U, F>
 where
     U: IntoIterator,
 {
     frontiter: Option<<U as IntoIterator>::IntoIter>,
     iter: I,
+    f: F,
 }
 
-impl<I, E, O2, U> Iterator for FlattenOk<I, U>
+impl<I, O, E, F, O2, U> Iterator for FlatMapOk<I, U, F>
 where
-    I: Iterator<Item = Result<U, E>>,
+    I: Iterator<Item = Result<O, E>>,
+    F: FnMut(O) -> U,
     U: IntoIterator<Item = O2>,
 {
     type Item = Result<O2, E>;
@@ -64,7 +72,7 @@ where
             match self.iter.next() {
                 None => return None,
                 Some(Ok(x)) => {
-                    self.frontiter = Some(x.into_iter());
+                    self.frontiter = Some((self.f)(x).into_iter());
                 }
                 Some(Err(e)) => return Some(Err(e)),
             }
@@ -80,14 +88,16 @@ where
 }
 
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
-pub struct FlattenErr<I, U: IntoIterator> {
+pub struct FlatMapErr<I, U: IntoIterator, F> {
     frontiter: Option<<U as IntoIterator>::IntoIter>,
     iter: I,
+    f: F,
 }
 
-impl<I, O, E2, U> Iterator for FlattenErr<I, U>
+impl<I, O, E, F, E2, U> Iterator for FlatMapErr<I, U, F>
 where
-    I: Iterator<Item = Result<O, U>>,
+    I: Iterator<Item = Result<O, E>>,
+    F: FnMut(E) -> U,
     U: IntoIterator<Item = E2>,
 {
     type Item = Result<O, E2>;
@@ -102,7 +112,7 @@ where
             match self.iter.next() {
                 None => return None,
                 Some(Err(e)) => {
-                    self.frontiter = Some(e.into_iter());
+                    self.frontiter = Some((self.f)(e).into_iter());
                 }
                 Some(Ok(o)) => return Some(Ok(o)),
             }
@@ -116,15 +126,11 @@ where
 }
 
 #[test]
-fn test_flatten_ok() {
-    use map_x::MapX;
-
+fn test_flat_map_ok() {
     let mapped: Vec<_> = vec![Ok(1), Ok(2), Err(2), Err(0), Ok(2)]
         .into_iter()
-        .map_ok(|i| (0..i))
-        .map_err(|i| 0..(i * 2))
-        .flatten_ok()
-        .flatten_err()
+        .flat_map_ok(|i| (0..i))
+        .flat_map_err(|i| 0..(i * 2))
         .collect();
 
     assert_eq!(

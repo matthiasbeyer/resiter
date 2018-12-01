@@ -5,29 +5,32 @@
 //
 
 /// Extension trait for `Iterator<Item = Result<O, E>>` to selectively transform Oks and Errors.
-pub trait MapX<O, E> : Sized
-{
+pub trait Map<O, E>: Sized {
     fn map_ok<F, O2>(self, F) -> MapOk<Self, F>
-        where F: FnMut(O) -> O2;
+    where
+        F: FnMut(O) -> O2;
     fn map_err<F, E2>(self, F) -> MapErr<Self, F>
-        where F: FnMut(E) -> E2;
+    where
+        F: FnMut(E) -> E2;
 }
 
-impl<I, O, E> MapX<O, E> for I
-    where I: Iterator<Item = Result<O, E>> + Sized,
+impl<I, O, E> Map<O, E> for I
+where
+    I: Iterator<Item = Result<O, E>> + Sized,
 {
     fn map_ok<F, O2>(self, f: F) -> MapOk<Self, F>
-        where F: FnMut(O) -> O2
+    where
+        F: FnMut(O) -> O2,
     {
-        MapOk{ iter: self, f }
+        MapOk { iter: self, f }
     }
     fn map_err<F, E2>(self, f: F) -> MapErr<Self, F>
-        where F: FnMut(E) -> E2
+    where
+        F: FnMut(E) -> E2,
     {
-        MapErr{ iter: self, f }
+        MapErr { iter: self, f }
     }
 }
-
 
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 pub struct MapOk<I, F> {
@@ -36,8 +39,9 @@ pub struct MapOk<I, F> {
 }
 
 impl<I, O, E, F, O2> Iterator for MapOk<I, F>
-    where I: Iterator<Item = Result<O, E>>,
-          F: FnMut(O) -> O2,
+where
+    I: Iterator<Item = Result<O, E>>,
+    F: FnMut(O) -> O2,
 {
     type Item = Result<O2, E>;
 
@@ -51,7 +55,6 @@ impl<I, O, E, F, O2> Iterator for MapOk<I, F>
     }
 }
 
-
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 pub struct MapErr<I, F> {
     iter: I,
@@ -59,8 +62,9 @@ pub struct MapErr<I, F> {
 }
 
 impl<I, O, E, F, E2> Iterator for MapErr<I, F>
-    where I: Iterator<Item = Result<O, E>>,
-          F: FnMut(E) -> E2,
+where
+    I: Iterator<Item = Result<O, E>>,
+    F: FnMut(E) -> E2,
 {
     type Item = Result<O, E2>;
 
@@ -74,7 +78,6 @@ impl<I, O, E, F, E2> Iterator for MapErr<I, F>
     }
 }
 
-
 #[test]
 fn test_map_ok() {
     use std::str::FromStr;
@@ -82,7 +85,7 @@ fn test_map_ok() {
     let mapped: Vec<_> = ["1", "2", "a", "4", "5"]
         .into_iter()
         .map(|txt| usize::from_str(txt))
-        .map_ok(|i| 2*i)
+        .map_ok(|i| 2 * i)
         .collect();
 
     assert_eq!(mapped[0], Ok(2));
@@ -98,7 +101,7 @@ fn test_map_ok_hint() {
     let hint = ["1", "2", "a", "4", "5"]
         .into_iter()
         .map(|txt| usize::from_str(txt))
-        .map_ok(|i| 2*i)
+        .map_ok(|i| 2 * i)
         .size_hint();
 
     assert_eq!(hint, (5, Some(5)));
@@ -114,7 +117,10 @@ fn test_map_err() {
         .map_err(|e| format!("{:?}", e))
         .collect();
 
-    assert_eq!(mapped[2], Err("ParseIntError { kind: InvalidDigit }".to_string()));
+    assert_eq!(
+        mapped[2],
+        Err("ParseIntError { kind: InvalidDigit }".to_string())
+    );
 }
 
 #[test]

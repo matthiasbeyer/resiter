@@ -5,7 +5,7 @@
 //
 
 /// Extension trait for `Iterator<Item = Result<O, E>>` to selectively transform Oks and Errors.
-pub trait AndThenX<O, E>: Sized {
+pub trait AndThen<O, E>: Sized {
     fn and_then_ok<F, O2>(self, F) -> AndThenOk<Self, F>
     where
         F: FnMut(O) -> Result<O2, E>;
@@ -14,7 +14,7 @@ pub trait AndThenX<O, E>: Sized {
         F: FnMut(E) -> Result<O, E2>;
 }
 
-impl<I, O, E> AndThenX<O, E> for I
+impl<I, O, E> AndThen<O, E> for I
 where
     I: Iterator<Item = Result<O, E>> + Sized,
 {

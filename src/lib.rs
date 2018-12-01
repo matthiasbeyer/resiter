@@ -108,7 +108,7 @@
 //! ```
 //! # fn main() {
 //! use std::str::FromStr;
-//! use resiter::map_x::*;
+//! use resiter::map::*;
 //!
 //! let doubles = ["1", "2", "foo", "4", "5"]
 //!     .into_iter()
@@ -125,7 +125,7 @@
 //! ```
 //! # fn main() {
 //! use std::str::FromStr;
-//! use resiter::map_x::*;
+//! use resiter::map::*;
 //!
 //! let doubles = ["1", "2", "foo", "4", "5"]
 //!     .into_iter()
@@ -141,7 +141,7 @@
 //! ```
 //! # fn main() {
 //! use std::str::FromStr;
-//! use resiter::filter_x::*;
+//! use resiter::filter::*;
 //!
 //! let doubles = ["1", "2", "foo", "4", "5"]
 //!     .into_iter()
@@ -158,7 +158,7 @@
 //! ```
 //! # fn main() {
 //! use std::str::FromStr;
-//! use resiter::filter_x::*;
+//! use resiter::filter::*;
 //!
 //! let doubles = ["1", "2", "foo", "4", "5"]
 //!     .into_iter()
@@ -194,13 +194,13 @@
 //! MPL 2.0
 //!
 
-pub mod and_then_x;
+pub mod and_then;
 pub mod errors;
-pub mod filter_map_x;
-pub mod filter_x;
-pub mod flat_map_x;
-pub mod flatten_x;
-pub mod map_x;
+pub mod filter;
+pub mod filter_map;
+pub mod flat_map;
+pub mod flatten;
+pub mod map;
 pub mod oks;
 pub mod onerr;
 pub mod onok;
@@ -209,13 +209,13 @@ pub mod unwrap;
 mod util;
 pub mod while_ok;
 
-pub use and_then_x::AndThenX;
+pub use and_then::AndThen;
 pub use errors::GetErrors;
-pub use filter_map_x::FilterMapX;
-pub use filter_x::FilterX;
-pub use flat_map_x::FlatMapX;
-pub use flatten_x::FlattenX;
-pub use map_x::MapX;
+pub use filter::Filter;
+pub use filter_map::FilterMap;
+pub use flat_map::FlatMap;
+pub use flatten::Flatten;
+pub use map::Map;
 pub use oks::GetOks;
 pub use onerr::OnErrDo;
 pub use onok::OnOkDo;
