@@ -117,7 +117,7 @@ where
 
 #[test]
 fn test_flatten_ok() {
-    use map_x::MapX;
+    use map::MapX;
 
     let mapped: Vec<_> = vec![Ok(1), Ok(2), Err(2), Err(0), Ok(2)]
         .into_iter()
