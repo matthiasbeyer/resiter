@@ -5,7 +5,7 @@
 //
 
 /// Extension trait for `Iterator<Item = Result<O, E>>` to selectively transform and map Oks and Errors.
-pub trait FilterMapX<O, E>: Sized {
+pub trait FilterMap<O, E>: Sized {
     fn filter_map_ok<F, O2>(self, F) -> FilterMapOk<Self, F>
     where
         F: FnMut(O) -> Option<O2>;
@@ -14,7 +14,7 @@ pub trait FilterMapX<O, E>: Sized {
         F: FnMut(E) -> Option<E2>;
 }
 
-impl<I, O, E> FilterMapX<O, E> for I
+impl<I, O, E> FilterMap<O, E> for I
 where
     I: Iterator<Item = Result<O, E>> + Sized,
 {

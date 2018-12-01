@@ -5,7 +5,7 @@
 //
 
 /// Extension trait for `Iterator<Item = Result<O, E>>` to selectively transform Oks and Errors.
-pub trait FlatMapX<O, E>: Sized {
+pub trait FlatMap<O, E>: Sized {
     fn flat_map_ok<U, F, O2>(self, F) -> FlatMapOk<Self, U, F>
     where
         F: FnMut(O) -> U,
@@ -16,7 +16,7 @@ pub trait FlatMapX<O, E>: Sized {
         U: IntoIterator<Item = E2>;
 }
 
-impl<I, O, E> FlatMapX<O, E> for I
+impl<I, O, E> FlatMap<O, E> for I
 where
     I: Iterator<Item = Result<O, E>> + Sized,
 {

@@ -5,29 +5,32 @@
 //
 
 /// Extension trait for `Iterator<Item = Result<O, E>>` to filter one kind of result (and leaving the other as is)
-pub trait FilterX<O, E> : Sized
-{
+pub trait Filter<O, E>: Sized {
     fn filter_ok<F>(self, F) -> FilterOk<Self, F>
-        where F: FnMut(&O) -> bool;
+    where
+        F: FnMut(&O) -> bool;
     fn filter_err<F>(self, F) -> FilterErr<Self, F>
-        where F: FnMut(&E) -> bool;
+    where
+        F: FnMut(&E) -> bool;
 }
 
-impl<I, O, E> FilterX<O, E> for I
-    where I: Iterator<Item = Result<O, E>> + Sized,
+impl<I, O, E> Filter<O, E> for I
+where
+    I: Iterator<Item = Result<O, E>> + Sized,
 {
     fn filter_ok<F>(self, f: F) -> FilterOk<Self, F>
-        where F: FnMut(&O) -> bool
+    where
+        F: FnMut(&O) -> bool,
     {
-        FilterOk{ iter: self, f }
+        FilterOk { iter: self, f }
     }
     fn filter_err<F>(self, f: F) -> FilterErr<Self, F>
-        where F: FnMut(&E) -> bool
+    where
+        F: FnMut(&E) -> bool,
     {
-        FilterErr{ iter: self, f }
+        FilterErr { iter: self, f }
     }
 }
-
 
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 pub struct FilterOk<I, F> {
@@ -36,8 +39,9 @@ pub struct FilterOk<I, F> {
 }
 
 impl<I, O, E, F> Iterator for FilterOk<I, F>
-    where I: Iterator<Item = Result<O, E>>,
-          F: FnMut(&O) -> bool,
+where
+    I: Iterator<Item = Result<O, E>>,
+    F: FnMut(&O) -> bool,
 {
     type Item = Result<O, E>;
 
@@ -49,7 +53,9 @@ impl<I, O, E, F> Iterator for FilterOk<I, F>
                         return Some(Ok(x));
                     }
                 }
-                other => { return other; }
+                other => {
+                    return other;
+                }
             }
         }
     }
@@ -61,7 +67,6 @@ impl<I, O, E, F> Iterator for FilterOk<I, F>
     }
 }
 
-
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 pub struct FilterErr<I, F> {
     iter: I,
@@ -69,8 +74,9 @@ pub struct FilterErr<I, F> {
 }
 
 impl<I, O, E, F> Iterator for FilterErr<I, F>
-    where I: Iterator<Item = Result<O, E>>,
-          F: FnMut(&E) -> bool,
+where
+    I: Iterator<Item = Result<O, E>>,
+    F: FnMut(&E) -> bool,
 {
     type Item = Result<O, E>;
 
@@ -82,7 +88,9 @@ impl<I, O, E, F> Iterator for FilterErr<I, F>
                         return Some(Err(x));
                     }
                 }
-                other => { return other; }
+                other => {
+                    return other;
+                }
             }
         }
     }
@@ -94,7 +102,6 @@ impl<I, O, E, F> Iterator for FilterErr<I, F>
     }
 }
 
-
 #[test]
 fn test_filter_ok() {
     use std::str::FromStr;
@@ -102,7 +109,7 @@ fn test_filter_ok() {
     let mapped: Vec<_> = ["1", "2", "a", "4", "5"]
         .into_iter()
         .map(|txt| usize::from_str(txt))
-        .filter_ok(|i| i%2 == 0)
+        .filter_ok(|i| i % 2 == 0)
         .collect();
 
     assert_eq!(mapped.len(), 3);
@@ -117,7 +124,7 @@ fn test_filter_ok_hint() {
     let hint = ["1", "2", "a", "4", "5"]
         .into_iter()
         .map(|txt| usize::from_str(txt))
-        .filter_ok(|i| i%2 == 0)
+        .filter_ok(|i| i % 2 == 0)
         .size_hint();
 
     assert_eq!(hint, (0, Some(5)));

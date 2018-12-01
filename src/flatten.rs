@@ -5,7 +5,7 @@
 //
 
 /// Extension trait for `Iterator<Item = Result<O, E>>` to selectively transform Oks and Errors.
-pub trait FlattenX<O, E>: Sized {
+pub trait Flatten<O, E>: Sized {
     fn flatten_ok<U, O2>(self) -> FlattenOk<Self, U>
     where
         U: IntoIterator<Item = O2>;
@@ -14,7 +14,7 @@ pub trait FlattenX<O, E>: Sized {
         U: IntoIterator<Item = E2>;
 }
 
-impl<I, O, E> FlattenX<O, E> for I
+impl<I, O, E> Flatten<O, E> for I
 where
     I: Iterator<Item = Result<O, E>> + Sized,
 {
@@ -117,7 +117,7 @@ where
 
 #[test]
 fn test_flatten_ok() {
-    use map::MapX;
+    use map::Map;
 
     let mapped: Vec<_> = vec![Ok(1), Ok(2), Err(2), Err(0), Ok(2)]
         .into_iter()
