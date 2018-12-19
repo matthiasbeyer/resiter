@@ -1,7 +1,8 @@
 [package]
 name = "resiter"
-version = "0.2.0"
-authors = ["Matthias Beyer <mail@beyermatthias.de>"]
+version = "0.3.0"
+authors = ["Matthias Beyer <mail@beyermatthias.de>",
+           "Dawid Ciężarkiewicz <dpc@dpc.pw>"]
 
 description = "Helper crate for handling iterators over result"
 
