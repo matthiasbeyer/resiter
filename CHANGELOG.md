@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0
+
+* Add `map_inner_ok_or_else()` which can be used to transform:
+    `Iterator<Item = Result<Option<T>, E>> -> Iterator<Item = Result<T, E>>`
+* More travis testing jobs were added. Minimal supported Rust version is still
+  1.21 though.
+
+
 ## 0.3.0
 
 * Re-export all traits from root module
