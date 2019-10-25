@@ -70,3 +70,60 @@ impl<I, T, E, F> Iterator for IterInnerOkOrElseImpl<I, T, E, F>
     }
 }
 
+
+#[test]
+fn compile_test_1() {
+    let v : Vec<i32> = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+    let _ : Result<Vec<i32>, &'static str> = v
+        .into_iter()
+        .map(Some)
+        .map(Ok)
+        .map_inner_ok_or_else(|| "error message")
+        .collect();
+}
+
+#[test]
+fn compile_test_2() {
+    let v : Vec<Option<i32>> = vec![Some(1), Some(2), Some(3), Some(4), Some(5), Some(6), Some(7), Some(8), Some(9), Some(0)];
+    let _ : Result<Vec<i32>, &'static str> = v
+        .into_iter()
+        .map(Ok)
+        .map_inner_ok_or_else(|| "error message")
+        .collect();
+}
+
+#[test]
+fn compile_test_3() {
+    let v : Vec<i32> = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+    let r : Result<Vec<i32>, &'static str> = v
+        .into_iter()
+        .map(|i| if i < 5 { Some(i) } else { None })
+        .map(Ok)
+        .map_inner_ok_or_else(|| "less than 5 in list")
+        .collect();
+
+    assert!(r.is_err());
+    assert_eq!(r.unwrap_err(), "less than 5 in list");
+}
+
+#[test]
+fn compile_test_4() {
+    use std::collections::HashMap;
+
+    let v : Vec<i32> = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+    let mut h = HashMap::new();
+    (0..10).into_iter().for_each(|e| {
+        h.insert(e, e);
+    });
+
+    let r : Result<Vec<_>, &'static str> = v
+        .into_iter()
+        .chain(::std::iter::once(10))
+        .map(|e| Ok(h.get(&e)))
+        .map_inner_ok_or_else(|| "at least one key missing")
+        .collect();
+
+    assert!(r.is_err());
+    assert_eq!(r.unwrap_err(), "at least one key missing");
+}
+
