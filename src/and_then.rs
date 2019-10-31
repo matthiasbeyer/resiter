@@ -91,7 +91,7 @@ fn test_and_then_ok() {
     use std::str::FromStr;
 
     let mapped: Vec<_> = ["1", "2", "a", "b", "4", "5"]
-        .into_iter()
+        .iter()
         .map(|txt| usize::from_str(txt).map_err(|e| (txt, e)))
         .and_then_ok(|i| Ok(2 * i))
         .and_then_err(|(txt, e)| if txt == &"a" { Ok(15) } else { Err(e) })
