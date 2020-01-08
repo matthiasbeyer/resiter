@@ -36,7 +36,6 @@
 //! * Consuming iterators until an error occurs
 //!
 //! ```
-//! # fn main() {
 //! use std::str::FromStr;
 //! use resiter::errors::*;
 //!
@@ -45,13 +44,11 @@
 //!     .map(|e| usize::from_str(e))
 //!     .errors()
 //!     .next(); // "4" and "5" will never be processed by the iterator
-//! # }
 //! ```
 //!
 //! * Consuming iterators and collect all errors
 //!
 //! ```
-//! # fn main() {
 //! use std::str::FromStr;
 //! use resiter::errors::*;
 //!
@@ -62,13 +59,11 @@
 //!     .collect::<Vec<::std::num::ParseIntError>>()
 //!     .len();
 //! assert_eq!(len, 1);
-//! # }
 //! ```
 //!
 //! * Consuming iterators and collect all oks
 //!
 //! ```
-//! # fn main() {
 //! use std::str::FromStr;
 //! use resiter::oks::*;
 //!
@@ -79,13 +74,11 @@
 //!     .collect::<Vec<_>>()
 //!     .len();
 //! assert_eq!(len, 4);
-//! # }
 //! ```
 //!
 //! * Printing errors / oks
 //!
 //! ```
-//! # fn main() {
 //! use std::str::FromStr;
 //! use resiter::oks::*;
 //! use resiter::onerr::*;
@@ -100,13 +93,11 @@
 //!     .collect::<Vec<_>>()
 //!     .len();
 //! assert_eq!(len, 4);
-//! # }
 //! ```
 //!
 //! * Transforming oks
 //!
 //! ```
-//! # fn main() {
 //! use std::str::FromStr;
 //! use resiter::map::*;
 //!
@@ -117,13 +108,11 @@
 //!     .collect::<Vec<_>>();
 //! assert_eq!(doubles[0], Ok(2));
 //! assert_eq!(doubles[1], Ok(4));
-//! # }
 //! ```
 //!
 //! * Transforming errors
 //!
 //! ```
-//! # fn main() {
 //! use std::str::FromStr;
 //! use resiter::map::*;
 //!
@@ -133,13 +122,11 @@
 //!     .map_err(|e| format!("{:?}", e))
 //!     .collect::<Vec<_>>();
 //! assert_eq!(doubles[2], Err("ParseIntError { kind: InvalidDigit }".to_string()));
-//! # }
 //! ```
 //!
 //! * Filtering oks (leaving errors as is)
 //!
 //! ```
-//! # fn main() {
 //! use std::str::FromStr;
 //! use resiter::filter::*;
 //!
@@ -150,13 +137,11 @@
 //!     .collect::<Vec<_>>();
 //! assert_eq!(doubles.len(), 3);
 //! assert_eq!(doubles[0], Ok(2));
-//! # }
 //! ```
 //!
 //! * Filtering errors (leaving oks as is)
 //!
 //! ```
-//! # fn main() {
 //! use std::str::FromStr;
 //! use resiter::filter::*;
 //!
@@ -167,13 +152,11 @@
 //!     .collect::<Vec<_>>();
 //! assert_eq!(doubles.len(), 4);
 //! assert_eq!(doubles[2], Ok(4));
-//! # }
 //! ```
 //!
 //! * Stopping the iteration on the first error
 //!
 //! ```
-//! # fn main() -> () {
 //! use std::str::FromStr;
 //! use resiter::while_ok::*;
 //!
@@ -186,7 +169,6 @@
 //! if res.is_err() {
 //!     println!("An error occured");
 //! }
-//! # }
 //! ```
 //!
 //! # License
