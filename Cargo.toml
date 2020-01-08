@@ -7,6 +7,7 @@ authors = ["Matthias Beyer <mail@beyermatthias.de>",
 description = "Helper crate for handling iterators over result"
 
 keywords    = ["iterator", "result", "util"]
+categories  = ["no-std"]
 readme      = "README.md"
 license     = "MPL-2.0"
 

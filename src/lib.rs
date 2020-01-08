@@ -194,6 +194,9 @@
 //! MPL 2.0
 //!
 
+#![cfg(not(test))]
+#![no_std]
+
 pub mod and_then;
 pub mod errors;
 pub mod filter;
