@@ -12,14 +12,15 @@ pub use util::Process as Errors;
 // for backward compatibility with previous implementation
 
 /// Extension trait for `Iterator<Item = Result<T, E>>` to get all `E`s
-pub trait GetErrors<T, E> : Sized {
-    fn errors(self) -> FilterMap<Self, fn(Result<T,E>) -> Option<E>>;
+pub trait GetErrors<T, E>: Sized {
+    fn errors(self) -> FilterMap<Self, fn(Result<T, E>) -> Option<E>>;
 }
 
 impl<T, E, I> GetErrors<T, E> for I
-    where I: Iterator<Item = Result<T, E>> + Sized
+where
+    I: Iterator<Item = Result<T, E>> + Sized,
 {
-    fn errors(self) -> FilterMap<Self, fn(Result<T,E>) -> Option<E>> {
+    fn errors(self) -> FilterMap<Self, fn(Result<T, E>) -> Option<E>> {
         self.filter_map(GetErr::get_err)
     }
 }
@@ -28,10 +29,12 @@ impl<T, E, I> GetErrors<T, E> for I
 fn test_compile() {
     use std::str::FromStr;
 
-    let _ : Result<_, ::std::num::ParseIntError> = ["1", "2", "3", "4", "5"]
+    let _: Result<_, ::std::num::ParseIntError> = ["1", "2", "3", "4", "5"]
         .into_iter()
         .map(|e| usize::from_str(e))
         .errors()
-        .process(|e| { println!("Error: {:?}", e); Ok(()) });
+        .process(|e| {
+            println!("Error: {:?}", e);
+            Ok(())
+        });
 }
-

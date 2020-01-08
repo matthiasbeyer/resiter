@@ -220,7 +220,7 @@ pub use filter_map::FilterMap;
 pub use flat_map::FlatMap;
 pub use flatten::Flatten;
 pub use map::Map;
-pub use ok_or_else::{ResultOptionExt, IterInnerOkOrElse};
+pub use ok_or_else::{IterInnerOkOrElse, ResultOptionExt};
 pub use oks::GetOks;
 pub use onerr::OnErrDo;
 pub use onok::OnOkDo;

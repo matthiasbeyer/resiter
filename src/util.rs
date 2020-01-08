@@ -24,17 +24,18 @@ impl<T, E> GetOk<T> for Result<T, E> {
     }
 }
 
-
 /// Extend any Iterator with a `process` method, equivalent to a fallible for_each.
 pub trait Process<T> {
     fn process<R: Default, E, F>(self, f: F) -> Result<R, E>
-        where F: Fn(T) -> Result<R, E>;
+    where
+        F: Fn(T) -> Result<R, E>;
 }
 
 impl<I: Iterator> Process<I::Item> for I {
     /// Process all errors with a lambda
     fn process<R: Default, E, F>(self, f: F) -> Result<R, E>
-        where F: Fn(I::Item) -> Result<R, E>
+    where
+        F: Fn(I::Item) -> Result<R, E>,
     {
         for element in self {
             let _ = f(element)?;
