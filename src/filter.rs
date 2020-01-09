@@ -132,10 +132,10 @@ where
         loop {
             match self.iter.next() {
                 Some(Ok(x)) => match (self.f)(&x) {
-                    Ok(true)  => return Some(Ok(x)),
+                    Ok(true) => return Some(Ok(x)),
                     Ok(false) => continue,
-                    Err(e)    => return Some(Err(e))
-                }
+                    Err(e) => return Some(Err(e)),
+                },
 
                 other => return other,
             }
@@ -217,4 +217,3 @@ fn test_filter_ok_and_then() {
     assert_eq!(v.iter().filter(|x| x.is_ok()).count(), 2);
     assert_eq!(v.iter().filter(|x| x.is_err()).count(), 1);
 }
-
