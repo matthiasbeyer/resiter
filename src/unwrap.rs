@@ -13,22 +13,26 @@
 ///
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
 pub struct UnwrapWith<I, O, E, F>(I, F)
-    where I: Iterator<Item = Result<O, E>>,
-          F: FnMut(E) -> Option<O>;
+where
+    I: Iterator<Item = Result<O, E>>,
+    F: FnMut(E) -> Option<O>;
 
 impl<I, O, E, F> Iterator for UnwrapWith<I, O, E, F>
-    where I: Iterator<Item = Result<O, E>>,
-          F: FnMut(E) -> Option<O>
+where
+    I: Iterator<Item = Result<O, E>>,
+    F: FnMut(E) -> Option<O>,
 {
     type Item = O;
 
     fn next(&mut self) -> Option<Self::Item> {
         while let Some(o) = self.0.next() {
             match o {
-                Ok(t)  => return Some(t),
-                Err(e) => if let Some(t) = (self.1)(e) {
-                    return Some(t);
-                },
+                Ok(t) => return Some(t),
+                Err(e) => {
+                    if let Some(t) = (self.1)(e) {
+                        return Some(t);
+                    }
+                }
             }
         }
 
@@ -37,15 +41,17 @@ impl<I, O, E, F> Iterator for UnwrapWith<I, O, E, F>
 }
 
 pub trait UnwrapWithExt<I, O, E, F>
-    where I: Iterator<Item = Result<O, E>>,
-          F: FnMut(E) -> Option<O>
+where
+    I: Iterator<Item = Result<O, E>>,
+    F: FnMut(E) -> Option<O>,
 {
     fn unwrap_with(self, F) -> UnwrapWith<I, O, E, F>;
 }
 
 impl<I, O, E, F> UnwrapWithExt<I, O, E, F> for I
-    where I: Iterator<Item = Result<O, E>>,
-          F: FnMut(E) -> Option<O>
+where
+    I: Iterator<Item = Result<O, E>>,
+    F: FnMut(E) -> Option<O>,
 {
     fn unwrap_with(self, f: F) -> UnwrapWith<I, O, E, F> {
         UnwrapWith(self, f)
@@ -56,10 +62,9 @@ impl<I, O, E, F> UnwrapWithExt<I, O, E, F> for I
 fn test_compile_1() {
     use std::str::FromStr;
 
-    let _ : Vec<usize> = ["1", "2", "3", "4", "5"]
+    let _: Vec<usize> = ["1", "2", "3", "4", "5"]
         .into_iter()
         .map(|e| usize::from_str(e))
         .unwrap_with(|_| None) // ignore errors
         .collect();
 }
-

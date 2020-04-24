@@ -109,7 +109,8 @@ fn test_filter_map_ok() {
         Ok("5"),
         Err("b"),
         Err("8"),
-    ].into_iter()
+    ]
+    .into_iter()
     .filter_map_ok(|txt| usize::from_str(txt).ok())
     .filter_map_err(|txt| usize::from_str(txt).ok().map(|i| i * 3))
     .collect();
