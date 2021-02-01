@@ -1,0 +1,16 @@
+image: debian/stable
+sources:
+  - https://git.sr.ht/~matthiasbeyer/resiter
+packages:
+  - curl
+  - openssl
+tasks:
+  - install: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.30.0
+  - build: |
+      cd resiter
+      PATH="$HOME/.cargo/bin:$PATH" cargo build --all --all-features
+  - test: |
+      cd resiter
+      PATH="$HOME/.cargo/bin:$PATH" cargo test --all --all-features
+
+
