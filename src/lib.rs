@@ -179,6 +179,7 @@
 #![cfg_attr(not(test), no_std)]
 
 pub mod and_then;
+pub mod and_then_filter;
 pub mod errors;
 pub mod filter;
 pub mod filter_map;
@@ -195,6 +196,7 @@ mod util;
 pub mod while_ok;
 
 pub use and_then::AndThen;
+pub use and_then_filter::AndThenFilter;
 pub use errors::GetErrors;
 pub use filter::Filter;
 pub use filter_map::FilterMap;
