@@ -4,7 +4,10 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
 
+#[cfg(not(test))]
 use core::iter::*;
+#[cfg(test)]
+use std::iter::*;
 
 use util::*;
 
