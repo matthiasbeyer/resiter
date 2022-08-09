@@ -139,6 +139,7 @@ jobs:
       - run: gitlint --commits $(git merge-base origin/master HEAD)..
 
   ci:
+    name: CI
     if: ${{ success() }}
     needs:
       - check
