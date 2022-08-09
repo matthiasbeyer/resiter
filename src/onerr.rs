@@ -8,21 +8,21 @@
 pub struct OnErr<I, O, E, F>(I, F)
 where
     I: Iterator<Item = Result<O, E>>,
-    F: Fn(&E) -> ();
+    F: Fn(&E);
 
 /// Extension trait for `Iterator<Item = Result<T, E>>` to do something on `Err(_)`
 pub trait OnErrDo<I, O, E, F>
 where
     I: Iterator<Item = Result<O, E>>,
-    F: Fn(&E) -> (),
+    F: Fn(&E),
 {
-    fn on_err(self, F) -> OnErr<I, O, E, F>;
+    fn on_err(self, _: F) -> OnErr<I, O, E, F>;
 }
 
 impl<I, O, E, F> OnErrDo<I, O, E, F> for I
 where
     I: Iterator<Item = Result<O, E>>,
-    F: Fn(&E) -> (),
+    F: Fn(&E),
 {
     fn on_err(self, f: F) -> OnErr<I, O, E, F> {
         OnErr(self, f)
@@ -32,7 +32,7 @@ where
 impl<I, O, E, F> Iterator for OnErr<I, O, E, F>
 where
     I: Iterator<Item = Result<O, E>>,
-    F: Fn(&E) -> (),
+    F: Fn(&E),
 {
     type Item = Result<O, E>;
 
@@ -51,7 +51,7 @@ fn test_compile_1() {
     use std::str::FromStr;
 
     let _: Vec<Result<usize, ::std::num::ParseIntError>> = ["1", "2", "3", "4", "5"]
-        .into_iter()
+        .iter()
         .map(|e| usize::from_str(e))
         .on_err(|e| println!("Error: {:?}", e))
         .collect();

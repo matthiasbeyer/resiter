@@ -25,7 +25,7 @@ where
     type Item = O;
 
     fn next(&mut self) -> Option<Self::Item> {
-        while let Some(o) = self.0.next() {
+        while let Some(o) = self.0.by_ref().next() {
             match o {
                 Ok(t) => return Some(t),
                 Err(e) => {
@@ -45,7 +45,7 @@ where
     I: Iterator<Item = Result<O, E>>,
     F: FnMut(E) -> Option<O>,
 {
-    fn unwrap_with(self, F) -> UnwrapWith<I, O, E, F>;
+    fn unwrap_with(self, _: F) -> UnwrapWith<I, O, E, F>;
 }
 
 impl<I, O, E, F> UnwrapWithExt<I, O, E, F> for I
@@ -63,7 +63,7 @@ fn test_compile_1() {
     use std::str::FromStr;
 
     let _: Vec<usize> = ["1", "2", "3", "4", "5"]
-        .into_iter()
+        .iter()
         .map(|e| usize::from_str(e))
         .unwrap_with(|_| None) // ignore errors
         .collect();

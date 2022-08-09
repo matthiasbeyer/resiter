@@ -6,9 +6,9 @@
 
 /// Extension trait for `Iterator<Item = Result<O, E>>` to iter until an error is encountered.
 pub trait WhileOk<O, E> {
-    fn while_ok<F>(self, F) -> Result<(), E>
+    fn while_ok<F>(self, _: F) -> Result<(), E>
     where
-        F: FnMut(O) -> ();
+        F: FnMut(O);
 }
 
 impl<I, O, E> WhileOk<O, E> for I
@@ -17,7 +17,7 @@ where
 {
     fn while_ok<F>(self, mut f: F) -> Result<(), E>
     where
-        F: FnMut(O) -> (),
+        F: FnMut(O),
     {
         for res in self {
             f(res?);
@@ -33,7 +33,7 @@ fn test_while_ok_ok() {
     let mut s = 0;
 
     let res = ["1", "2", "3", "4", "5"]
-        .into_iter()
+        .iter()
         .map(|txt| usize::from_str(txt))
         .while_ok(|i| s += i);
 
@@ -48,7 +48,7 @@ fn test_while_ok_err() {
     let mut s = 0;
 
     let res = ["1", "2", "a", "4", "5"]
-        .into_iter()
+        .iter()
         .map(|txt| usize::from_str(txt))
         .while_ok(|i| s += i);
 

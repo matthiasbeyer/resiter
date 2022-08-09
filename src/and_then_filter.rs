@@ -6,7 +6,7 @@
 
 /// Extension trait for `Iterator<Item = Result<O, E>>` to selectively transform and map Oks and Errors.
 pub trait AndThenFilter<O, E>: Sized {
-    fn and_then_filter<F, O2>(self, F) -> AndThenFilterOk<Self, F>
+    fn and_then_filter<F, O2>(self, _: F) -> AndThenFilterOk<Self, F>
     where
         F: FnMut(O) -> Option<Result<O2, E>>;
 }
@@ -17,7 +17,7 @@ where
 {
     fn and_then_filter<F, O2>(self, f: F) -> AndThenFilterOk<Self, F>
     where
-        F: FnMut(O) -> Option<Result<O2, E>>
+        F: FnMut(O) -> Option<Result<O2, E>>,
     {
         AndThenFilterOk { iter: self, f }
     }
@@ -39,13 +39,11 @@ where
     fn next(&mut self) -> Option<Self::Item> {
         loop {
             match self.iter.next() {
-                Some(Ok(x)) => {
-                    match (self.f)(x) {
-                        Some(Err(e)) => return Some(Err(e)),
-                        Some(Ok(o)) => return Some(Ok(o)),
-                        None => continue,
-                    }
-                }
+                Some(Ok(x)) => match (self.f)(x) {
+                    Some(Err(e)) => return Some(Err(e)),
+                    Some(Ok(o)) => return Some(Ok(o)),
+                    None => continue,
+                },
                 Some(Err(e)) => return Some(Err(e)),
                 None => return None,
             }
@@ -77,10 +75,12 @@ fn test_and_then_filter() {
         let r = usize::from_str(txt).map_err(|e| e.to_string());
         match r {
             Err(e) => Some(Err(e)),
-            Ok(u) => if u < 3 {
-                Some(Ok(u))
-            } else {
-                None
+            Ok(u) => {
+                if u < 3 {
+                    Some(Ok(u))
+                } else {
+                    None
+                }
             }
         }
     })

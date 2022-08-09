@@ -6,14 +6,14 @@
 
 /// Extension trait for `Iterator<Item = Result<O, E>>` to filter one kind of result (and leaving the other as is)
 pub trait Filter<O, E>: Sized {
-    fn filter_ok<F>(self, F) -> FilterOk<Self, F>
+    fn filter_ok<F>(self, _: F) -> FilterOk<Self, F>
     where
         F: FnMut(&O) -> bool;
-    fn filter_err<F>(self, F) -> FilterErr<Self, F>
+    fn filter_err<F>(self, _: F) -> FilterErr<Self, F>
     where
         F: FnMut(&E) -> bool;
 
-    fn filter_ok_and_then<F>(self, F) -> FilterOkAndThenImpl<Self, F>
+    fn filter_ok_and_then<F>(self, _: F) -> FilterOkAndThenImpl<Self, F>
     where
         F: FnMut(&O) -> Result<bool, E>;
 }
@@ -154,7 +154,7 @@ fn test_filter_ok() {
     use std::str::FromStr;
 
     let mapped: Vec<_> = ["1", "2", "a", "4", "5"]
-        .into_iter()
+        .iter()
         .map(|txt| usize::from_str(txt))
         .filter_ok(|i| i % 2 == 0)
         .collect();
@@ -169,7 +169,7 @@ fn test_filter_ok_hint() {
     use std::str::FromStr;
 
     let hint = ["1", "2", "a", "4", "5"]
-        .into_iter()
+        .iter()
         .map(|txt| usize::from_str(txt))
         .filter_ok(|i| i % 2 == 0)
         .size_hint();
@@ -182,7 +182,7 @@ fn test_filter_err() {
     use std::str::FromStr;
 
     let mapped: Vec<_> = ["1", "2", "a", "4", "5"]
-        .into_iter()
+        .iter()
         .map(|txt| usize::from_str(txt))
         .filter_err(|_| false)
         .collect();
@@ -195,7 +195,7 @@ fn test_filter_err_hint() {
     use std::str::FromStr;
 
     let hint = ["1", "2", "a", "4", "5"]
-        .into_iter()
+        .iter()
         .map(|txt| usize::from_str(txt))
         .filter_err(|_| false)
         .size_hint();
@@ -208,7 +208,7 @@ fn test_filter_ok_and_then() {
     use std::str::FromStr;
 
     let v = ["1", "2", "a", "4", "5"]
-        .into_iter()
+        .iter()
         .map(Ok)
         .filter_ok_and_then(|e| usize::from_str(e).map(|txt| txt < 3))
         .collect::<Vec<Result<_, _>>>();
