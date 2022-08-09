@@ -138,6 +138,13 @@ jobs:
         run: pip install gitlint
       - run: gitlint --commits $(git merge-base origin/master HEAD)..
 
+  license:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Check License Lines
+        uses: kt3k/license_checker@v1.0.6
+
   ci:
     name: CI
     if: ${{ success() }}
@@ -148,6 +155,7 @@ jobs:
       - deny
       - doc
       - fmt
+      - license
       - test
     runs-on: ubuntu-latest
     steps:
