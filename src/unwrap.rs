@@ -25,7 +25,7 @@ where
     type Item = O;
 
     fn next(&mut self) -> Option<Self::Item> {
-        while let Some(o) = self.0.next() {
+        while let Some(o) = self.0.by_ref().next() {
             match o {
                 Ok(t) => return Some(t),
                 Err(e) => {
