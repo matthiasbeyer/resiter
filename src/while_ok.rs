@@ -8,7 +8,7 @@
 pub trait WhileOk<O, E> {
     fn while_ok<F>(self, _: F) -> Result<(), E>
     where
-        F: FnMut(O) -> ();
+        F: FnMut(O);
 }
 
 impl<I, O, E> WhileOk<O, E> for I
@@ -17,7 +17,7 @@ where
 {
     fn while_ok<F>(self, mut f: F) -> Result<(), E>
     where
-        F: FnMut(O) -> (),
+        F: FnMut(O),
     {
         for res in self {
             f(res?);

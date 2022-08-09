@@ -8,13 +8,13 @@
 pub struct OnOk<I, O, E, F>(I, F)
 where
     I: Iterator<Item = Result<O, E>>,
-    F: Fn(&O) -> ();
+    F: Fn(&O);
 
 /// Extension trait for `Iterator<Item = Result<T, E>>` to do something on `Ok(_)`
 pub trait OnOkDo<I, O, E, F>
 where
     I: Iterator<Item = Result<O, E>>,
-    F: Fn(&O) -> (),
+    F: Fn(&O),
 {
     fn on_ok(self, _: F) -> OnOk<I, O, E, F>;
 }
@@ -22,7 +22,7 @@ where
 impl<I, O, E, F> OnOkDo<I, O, E, F> for I
 where
     I: Iterator<Item = Result<O, E>>,
-    F: Fn(&O) -> (),
+    F: Fn(&O),
 {
     fn on_ok(self, f: F) -> OnOk<I, O, E, F> {
         OnOk(self, f)
@@ -32,7 +32,7 @@ where
 impl<I, O, E, F> Iterator for OnOk<I, O, E, F>
 where
     I: Iterator<Item = Result<O, E>>,
-    F: Fn(&O) -> (),
+    F: Fn(&O),
 {
     type Item = Result<O, E>;
 

@@ -8,13 +8,13 @@
 pub struct OnErr<I, O, E, F>(I, F)
 where
     I: Iterator<Item = Result<O, E>>,
-    F: Fn(&E) -> ();
+    F: Fn(&E);
 
 /// Extension trait for `Iterator<Item = Result<T, E>>` to do something on `Err(_)`
 pub trait OnErrDo<I, O, E, F>
 where
     I: Iterator<Item = Result<O, E>>,
-    F: Fn(&E) -> (),
+    F: Fn(&E),
 {
     fn on_err(self, _: F) -> OnErr<I, O, E, F>;
 }
@@ -22,7 +22,7 @@ where
 impl<I, O, E, F> OnErrDo<I, O, E, F> for I
 where
     I: Iterator<Item = Result<O, E>>,
-    F: Fn(&E) -> (),
+    F: Fn(&E),
 {
     fn on_err(self, f: F) -> OnErr<I, O, E, F> {
         OnErr(self, f)
@@ -32,7 +32,7 @@ where
 impl<I, O, E, F> Iterator for OnErr<I, O, E, F>
 where
     I: Iterator<Item = Result<O, E>>,
-    F: Fn(&E) -> (),
+    F: Fn(&E),
 {
     type Item = Result<O, E>;
 
