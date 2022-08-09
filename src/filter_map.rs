@@ -6,10 +6,10 @@
 
 /// Extension trait for `Iterator<Item = Result<O, E>>` to selectively transform and map Oks and Errors.
 pub trait FilterMap<O, E>: Sized {
-    fn filter_map_ok<F, O2>(self, F) -> FilterMapOk<Self, F>
+    fn filter_map_ok<F, O2>(self, _: F) -> FilterMapOk<Self, F>
     where
         F: FnMut(O) -> Option<O2>;
-    fn filter_map_err<F, E2>(self, F) -> FilterMapErr<Self, F>
+    fn filter_map_err<F, E2>(self, _: F) -> FilterMapErr<Self, F>
     where
         F: FnMut(E) -> Option<E2>;
 }
@@ -127,7 +127,7 @@ fn test_filter_map_ok_hint() {
     use std::str::FromStr;
 
     let hint = ["1", "2", "a", "4", "5"]
-        .into_iter()
+        .iter()
         .map(|txt| usize::from_str(txt))
         .filter_map_ok(|i| Some(2 * i))
         .size_hint();
@@ -140,7 +140,7 @@ fn test_filter_map_err_hint() {
     use std::str::FromStr;
 
     let hint = ["1", "2", "a", "4", "5"]
-        .into_iter()
+        .iter()
         .map(|txt| usize::from_str(txt))
         .filter_map_err(|e| Some(format!("{:?}", e)))
         .size_hint();

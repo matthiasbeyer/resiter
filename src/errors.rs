@@ -33,7 +33,7 @@ fn test_compile() {
     use std::str::FromStr;
 
     let _: Result<_, ::std::num::ParseIntError> = ["1", "2", "3", "4", "5"]
-        .into_iter()
+        .iter()
         .map(|e| usize::from_str(e))
         .errors()
         .process(|e| {

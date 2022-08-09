@@ -6,7 +6,7 @@
 
 /// Extension trait for `Iterator<Item = Result<O, E>>` to selectively transform and map Oks and Errors.
 pub trait AndThenFilter<O, E>: Sized {
-    fn and_then_filter<F, O2>(self, F) -> AndThenFilterOk<Self, F>
+    fn and_then_filter<F, O2>(self, _: F) -> AndThenFilterOk<Self, F>
     where
         F: FnMut(O) -> Option<Result<O2, E>>;
 }

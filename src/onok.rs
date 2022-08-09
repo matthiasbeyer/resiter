@@ -16,7 +16,7 @@ where
     I: Iterator<Item = Result<O, E>>,
     F: Fn(&O) -> (),
 {
-    fn on_ok(self, F) -> OnOk<I, O, E, F>;
+    fn on_ok(self, _: F) -> OnOk<I, O, E, F>;
 }
 
 impl<I, O, E, F> OnOkDo<I, O, E, F> for I
@@ -51,7 +51,7 @@ fn test_compile_1() {
     use std::str::FromStr;
 
     let _: Vec<Result<usize, ::std::num::ParseIntError>> = ["1", "2", "3", "4", "5"]
-        .into_iter()
+        .iter()
         .map(|e| usize::from_str(e))
         .on_ok(|e| println!("Ok: {:?}", e))
         .collect();
