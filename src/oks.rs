@@ -15,6 +15,7 @@ pub use util::Process as Oks;
 // for backward compatibility with previous implementation
 
 /// Extension trait for `Iterator<Item = Result<T, E>>` to get all `T`s
+#[allow(clippy::type_complexity)]
 pub trait GetOks<T, E>: Sized {
     fn oks(self) -> FilterMap<Self, fn(Result<T, E>) -> Option<T>>;
 }
@@ -23,6 +24,7 @@ impl<T, E, I> GetOks<T, E> for I
 where
     I: Iterator<Item = Result<T, E>> + Sized,
 {
+    #[allow(clippy::type_complexity)]
     fn oks(self) -> FilterMap<Self, fn(Result<T, E>) -> Option<T>> {
         self.filter_map(GetOk::get_ok)
     }
