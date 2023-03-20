@@ -13,7 +13,7 @@ pub trait Filter<O, E>: Sized {
     where
         F: FnMut(&E) -> bool;
 
-    fn filter_ok_and_then<F>(self, _: F) -> FilterOkAndThenImpl<Self, F>
+    fn try_filter_ok<F>(self, _: F) -> TryFilterOk<Self, F>
     where
         F: FnMut(&O) -> Result<bool, E>;
 }
@@ -37,11 +37,11 @@ where
 
     /// Extension for `Iterator<Item = Result<O, E>>` to filter the Ok(_) and leaving the Err(_) as
     /// is, but allowing the filter to return a `Result<bool, E>` itself
-    fn filter_ok_and_then<F>(self, f: F) -> FilterOkAndThenImpl<Self, F>
+    fn try_filter_ok<F>(self, f: F) -> TryFilterOk<Self, F>
     where
         F: FnMut(&O) -> Result<bool, E>,
     {
-        FilterOkAndThenImpl { iter: self, f }
+        TryFilterOk { iter: self, f }
     }
 }
 
@@ -116,12 +116,12 @@ where
 }
 
 #[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
-pub struct FilterOkAndThenImpl<I, F> {
+pub struct TryFilterOk<I, F> {
     iter: I,
     f: F,
 }
 
-impl<I, O, E, F> Iterator for FilterOkAndThenImpl<I, F>
+impl<I, O, E, F> Iterator for TryFilterOk<I, F>
 where
     I: Iterator<Item = Result<O, E>>,
     F: FnMut(&O) -> Result<bool, E>,
@@ -161,7 +161,7 @@ fn test_filter_ok() {
 
     assert_eq!(mapped.len(), 3);
     assert_eq!(mapped[0], Ok(2));
-    assert_eq!(mapped[2], Ok(4));
+    assert_eq!(mapped[2], Ok(4))
 }
 
 #[test]
@@ -204,13 +204,13 @@ fn test_filter_err_hint() {
 }
 
 #[test]
-fn test_filter_ok_and_then() {
+fn test_try_filter_ok() {
     use std::str::FromStr;
 
     let v = ["1", "2", "a", "4", "5"]
         .iter()
         .map(Ok)
-        .filter_ok_and_then(|e| usize::from_str(e).map(|txt| txt < 3))
+        .try_filter_ok(|e| usize::from_str(e).map(|txt| txt < 3))
         .collect::<Vec<Result<_, _>>>();
 
     assert_eq!(v.len(), 3);
