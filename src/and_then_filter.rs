@@ -82,15 +82,14 @@ where
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {
-            match self.iter.next() {
+            return match self.iter.next() {
                 Some(Ok(x)) => match (self.f)(x) {
-                    Some(Err(e)) => return Some(Err(e)),
-                    Some(Ok(o)) => return Some(Ok(o)),
+                    Some(r) => Some(r),
                     None => continue,
                 },
-                Some(Err(e)) => return Some(Err(e)),
-                None => return None,
-            }
+                Some(Err(e)) => Some(Err(e)),
+                None => None,
+            };
         }
     }
 
