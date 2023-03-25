@@ -6,6 +6,50 @@
 
 /// Extension trait for `Iterator<Item = Result<O, E>>` to selectively transform and map Oks and Errors.
 pub trait AndThenFilter<O, E>: Sized {
+    /// Equivalent to [Iterator::filter_map] on all `Ok` values.
+    /// The filter function can fail with a result and turn an
+    /// [Result::Ok] into a [Result::Err]
+    ///
+    /// ```
+    /// use std::str::FromStr;
+    /// use resiter::and_then_filter::AndThenFilter;
+    ///
+    /// let filter_mapped: Vec<_> = vec![
+    ///     Ok("1"),
+    ///     Err("2".to_owned()),
+    ///     Ok("a"), // will become an error
+    ///     Err("4".to_owned()),
+    ///     Ok("5"), // will be filtered out
+    ///     Err("b".to_owned()),
+    ///     Err("8".to_owned()),
+    /// ]
+    /// .into_iter()
+    /// .and_then_filter(|txt| {
+    ///     match usize::from_str(txt).map_err(|e| e.to_string()) {
+    ///         Err(e) => Some(Err(e)),
+    ///         Ok(u) => {
+    ///             if u < 3 {
+    ///                 Some(Ok(u))
+    ///             } else {
+    ///                 None
+    ///             }
+    ///         }
+    ///     }
+    /// })
+    /// .collect();
+    ///
+    /// assert_eq!(
+    ///     filter_mapped,
+    ///     [
+    ///         Ok(1),
+    ///         Err("2".to_owned()),
+    ///         Err("invalid digit found in string".to_owned()),
+    ///         Err("4".to_owned()),
+    ///         Err("b".to_owned()),
+    ///         Err("8".to_owned())
+    ///     ]
+    /// );
+    /// ```
     fn and_then_filter<F, O2>(self, _: F) -> AndThenFilterOk<Self, F>
     where
         F: FnMut(O) -> Option<Result<O2, E>>;
@@ -54,46 +98,4 @@ where
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.iter.size_hint()
     }
-}
-
-#[test]
-fn test_and_then_filter() {
-    use std::str::FromStr;
-
-    let filter_mapped: Vec<_> = vec![
-        Ok("1"),
-        Err("2"),
-        Ok("a"),
-        Err("4"),
-        Ok("5"),
-        Err("b"),
-        Err("8"),
-    ]
-    .into_iter()
-    .map(|r| r.map_err(String::from))
-    .and_then_filter(|txt| {
-        let r = usize::from_str(txt).map_err(|e| e.to_string());
-        match r {
-            Err(e) => Some(Err(e)),
-            Ok(u) => {
-                if u < 3 {
-                    Some(Ok(u))
-                } else {
-                    None
-                }
-            }
-        }
-    })
-    .collect();
-
-    assert_eq!(filter_mapped.len(), 6);
-    assert_eq!(filter_mapped[0], Ok(1));
-    assert_eq!(filter_mapped[1], Err(String::from("2")));
-
-    assert_ne!(filter_mapped[2], Err(String::from("a")));
-    assert!(filter_mapped[2].is_err());
-
-    assert_eq!(filter_mapped[3], Err(String::from("4")));
-    assert_eq!(filter_mapped[4], Err(String::from("b")));
-    assert_eq!(filter_mapped[5], Err(String::from("8")));
 }
