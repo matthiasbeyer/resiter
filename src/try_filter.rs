@@ -4,7 +4,26 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
 
+/// Extension for `Iterator<Item = Result<O, E>>` to filter the Ok(_) and leaving the Err(_) as
+/// is, but allowing the filter to return a `Result<bool, E>` itself
 pub trait TryFilter<O, E>: Sized {
+    /// Filters every `Ok`-value with a function that can return an Err.
+    /// Useful when the filter condition uses functions that can fail.
+    ///
+    ///```
+    /// use resiter::try_filter::TryFilter;
+    /// use std::str::FromStr;
+    ///
+    /// let v = ["1", "2", "4", "a", "5"]
+    ///     .iter()
+    ///     .map(Ok)
+    ///     .try_filter_ok(|e| usize::from_str(e).map(|txt| txt < 3))
+    ///     .collect::<Vec<Result<_, _>>>();
+    ///
+    /// assert_eq!(v.len(), 3);
+    /// assert_eq!(v.iter().filter(|x| x.is_ok()).count(), 2);
+    /// assert_eq!(v.iter().filter(|x| x.is_err()).count(), 1);
+    ///```
     fn try_filter_ok<F>(self, _: F) -> TryFilterOk<Self, F>
     where
         F: FnMut(&O) -> Result<bool, E>;
@@ -14,8 +33,6 @@ impl<I, O, E> TryFilter<O, E> for I
 where
     I: Iterator<Item = Result<O, E>> + Sized,
 {
-    /// Extension for `Iterator<Item = Result<O, E>>` to filter the Ok(_) and leaving the Err(_) as
-    /// is, but allowing the filter to return a `Result<bool, E>` itself
     fn try_filter_ok<F>(self, f: F) -> TryFilterOk<Self, F>
     where
         F: FnMut(&O) -> Result<bool, E>,
@@ -56,19 +73,4 @@ where
         let hint_sup = self.iter.size_hint().1;
         (0, hint_sup)
     }
-}
-
-#[test]
-fn test_try_filter_ok() {
-    use std::str::FromStr;
-
-    let v = ["1", "2", "a", "4", "5"]
-        .iter()
-        .map(Ok)
-        .try_filter_ok(|e| usize::from_str(e).map(|txt| txt < 3))
-        .collect::<Vec<Result<_, _>>>();
-
-    assert_eq!(v.len(), 3);
-    assert_eq!(v.iter().filter(|x| x.is_ok()).count(), 2);
-    assert_eq!(v.iter().filter(|x| x.is_err()).count(), 1);
 }
