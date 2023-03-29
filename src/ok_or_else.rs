@@ -79,8 +79,7 @@ where
 #[test]
 fn compile_test_1() {
     let v: Vec<i32> = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
-    let _: Result<Vec<i32>, &'static str> = v
-        .into_iter()
+    let _: Result<Vec<i32>, &'static str> = v.into_iter()
         .map(Some)
         .map(Ok)
         .map_inner_ok_or_else(|| "error message")
@@ -101,8 +100,7 @@ fn compile_test_2() {
         Some(9),
         Some(0),
     ];
-    let _: Result<Vec<i32>, &'static str> = v
-        .into_iter()
+    let _: Result<Vec<i32>, &'static str> = v.into_iter()
         .map(Ok)
         .map_inner_ok_or_else(|| "error message")
         .collect();
@@ -111,8 +109,7 @@ fn compile_test_2() {
 #[test]
 fn compile_test_3() {
     let v: Vec<i32> = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
-    let r: Result<Vec<i32>, &'static str> = v
-        .into_iter()
+    let r: Result<Vec<i32>, &'static str> = v.into_iter()
         .map(|i| if i < 5 { Some(i) } else { None })
         .map(Ok)
         .map_inner_ok_or_else(|| "less than 5 in list")
@@ -132,8 +129,7 @@ fn compile_test_4() {
         h.insert(e, e);
     });
 
-    let r: Result<Vec<_>, &'static str> = v
-        .into_iter()
+    let r: Result<Vec<_>, &'static str> = v.into_iter()
         .chain(::std::iter::once(10))
         .map(|e| Ok(h.get(&e)))
         .map_inner_ok_or_else(|| "at least one key missing")
