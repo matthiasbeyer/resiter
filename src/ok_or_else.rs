@@ -4,7 +4,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
 
-/// Extension trait for doing `Result<Option<T>, E>  ->  Result<T, E>`
+/// Extension trait for doing `Result<Option<T>, E>`  ->  `Result<T, E>`
 pub trait ResultOptionExt<T, E, F>
 where
     T: Sized,
