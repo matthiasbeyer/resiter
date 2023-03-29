@@ -11,6 +11,26 @@ where
     E: Sized,
     F: FnOnce() -> E,
 {
+    /// Apply [Option::or_else] on option values in wrapped in
+    /// `Result::Ok`.
+    ///
+    /// ```
+    /// use resiter::ok_or_else::ResultOptionExt;
+    ///
+    /// let res = Ok(Some(1));
+    /// let unwrapped = res.inner_ok_or_else(|| "else this");
+    /// assert_eq!(unwrapped, Ok(1));
+    /// ```
+    /// If the value is `None` the result will fail with the provided
+    /// error.
+    ///
+    /// ```
+    /// use resiter::ok_or_else::ResultOptionExt;
+    ///
+    /// let res = Ok(None);
+    /// let unwrapped: Result<i32, &'static str> = res.inner_ok_or_else(|| "else this");
+    /// assert_eq!(unwrapped, Err("else this"));
+    /// ```
     fn inner_ok_or_else(self, f: F) -> Result<T, E>;
 }
 
@@ -91,18 +111,4 @@ where
     fn next(&mut self) -> Option<Self::Item> {
         self.0.next().map(|e| e.inner_ok_or_else(|| self.1()))
     }
-}
-
-#[test]
-fn test_unwrap_optional_some_inside_result() {
-    let res = Ok(Some(1));
-    let unwrapped = res.inner_ok_or_else(|| "else this");
-    assert_eq!(unwrapped, Ok(1));
-}
-
-#[test]
-fn test_unwrap_optional_none_inside_result() {
-    let res = Ok(None);
-    let unwrapped: Result<i32, &'static str> = res.inner_ok_or_else(|| "else this");
-    assert_eq!(unwrapped, Err("else this"));
 }
