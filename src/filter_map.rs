@@ -18,6 +18,30 @@ impl<I, O, E> FilterMap<O, E> for I
 where
     I: Iterator<Item = Result<O, E>> + Sized,
 {
+    /// `filter_map` every `Ok` value
+    ///
+    /// ```
+    /// use std::str::FromStr;
+    /// use resiter::filter_map::FilterMap;
+    ///
+    /// let filter_mapped: Vec<_> = vec![
+    ///     Ok("1"),
+    ///     Err("2"),
+    ///     Ok("a"),
+    ///     Err("4"),
+    ///     Ok("5"),
+    ///     Err("b"),
+    ///     Err("8"),
+    /// ].into_iter()
+    ///     .filter_map_ok(|txt| usize::from_str(txt).ok())
+    ///     .collect();
+    /// assert_eq!(filter_mapped[0], Ok(1));
+    /// assert_eq!(filter_mapped[1], Err("2"));
+    /// assert_eq!(filter_mapped[2], Err("4"));
+    /// assert_eq!(filter_mapped[3], Ok(5));
+    /// assert_eq!(filter_mapped[4], Err("b"));
+    /// assert_eq!(filter_mapped[5], Err("8"));
+    /// ```
     fn filter_map_ok<F, O2>(self, f: F) -> FilterMapOk<Self, F>
     where
         F: FnMut(O) -> Option<O2>,
@@ -121,29 +145,6 @@ where
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.iter.size_hint()
     }
-}
-
-#[test]
-fn test_filter_map_ok() {
-    use std::str::FromStr;
-
-    let filter_mapped: Vec<_> = vec![
-        Ok("1"),
-        Err("2"),
-        Ok("a"),
-        Err("4"),
-        Ok("5"),
-        Err("b"),
-        Err("8"),
-    ].into_iter()
-        .filter_map_ok(|txt| usize::from_str(txt).ok())
-        .collect();
-    assert_eq!(filter_mapped[0], Ok(1));
-    assert_eq!(filter_mapped[1], Err("2"));
-    assert_eq!(filter_mapped[2], Err("4"));
-    assert_eq!(filter_mapped[3], Ok(5));
-    assert_eq!(filter_mapped[4], Err("b"));
-    assert_eq!(filter_mapped[5], Err("8"));
 }
 
 #[test]
