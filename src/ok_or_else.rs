@@ -89,9 +89,7 @@ where
     type Item = Result<T, E>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.0
-            .next()
-            .map(|e| e.and_then(|opt| opt.ok_or_else(|| (self.1)())))
+        self.0.next().map(|e| e.inner_ok_or_else(|| self.1()))
     }
 }
 
