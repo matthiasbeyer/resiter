@@ -26,11 +26,7 @@ where
 }
 
 /// Extension trait for doing
-///
-/// ```ignore
-///     Iterator<Item = Result<Option<T>, E>>  ->  Iterator<Item = Result<T, E>>
-/// ```
-///
+/// `Iterator<Item = Result<Option<T>, E>>`  ->  `Iterator<Item = Result<T, E>>`
 pub trait IterInnerOkOrElse<T, E, F>
 where
     T: Sized,
