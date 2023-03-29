@@ -83,23 +83,14 @@ fn compile_test_1() {
 }
 
 #[test]
-fn compile_test_2() {
-    let v: Vec<Option<i32>> = vec![
-        Some(1),
-        Some(2),
-        Some(3),
-        Some(4),
-        Some(5),
-        Some(6),
-        Some(7),
-        Some(8),
-        Some(9),
-        Some(0),
-    ];
-    let _: Result<Vec<i32>, &'static str> = v.into_iter()
+fn test_unwrap_optional_values() {
+    let v: Vec<Option<i32>> = vec![Some(1), Some(2), None, Some(4)];
+    let res: Vec<Result<i32, &'static str>> = v.into_iter()
         .map(Ok)
         .map_inner_ok_or_else(|| "error message")
         .collect();
+
+    assert_eq!(res, vec![Ok(1), Ok(2), Err("error message"), Ok(4)])
 }
 
 #[test]
