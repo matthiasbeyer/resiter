@@ -82,3 +82,17 @@ fn test_unwrap_optional_values() {
 
     assert_eq!(res, vec![Ok(1), Ok(2), Err("error message"), Ok(4)])
 }
+
+#[test]
+fn test_unwrap_optional_some_inside_result() {
+    let res = Ok(Some(1));
+    let unwrapped = res.inner_ok_or_else(|| "else this");
+    assert_eq!(unwrapped, Ok(1));
+}
+
+#[test]
+fn test_unwrap_optional_none_inside_result() {
+    let res = Ok(None);
+    let unwrapped: Result<i32, &'static str> = res.inner_ok_or_else(|| "else this");
+    assert_eq!(unwrapped, Err("else this"));
+}
