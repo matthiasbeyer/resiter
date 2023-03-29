@@ -109,17 +109,39 @@ fn test_filter_map_ok() {
         Ok("5"),
         Err("b"),
         Err("8"),
-    ]
-    .into_iter()
-    .filter_map_ok(|txt| usize::from_str(txt).ok())
-    .filter_map_err(|txt| usize::from_str(txt).ok().map(|i| i * 3))
-    .collect();
-
+    ].into_iter()
+        .filter_map_ok(|txt| usize::from_str(txt).ok())
+        .collect();
     assert_eq!(filter_mapped[0], Ok(1));
-    assert_eq!(filter_mapped[1], Err(2 * 3));
-    assert_eq!(filter_mapped[2], Err(4 * 3));
+    assert_eq!(filter_mapped[1], Err("2"));
+    assert_eq!(filter_mapped[2], Err("4"));
     assert_eq!(filter_mapped[3], Ok(5));
-    assert_eq!(filter_mapped[4], Err(8 * 3));
+    assert_eq!(filter_mapped[4], Err("b"));
+    assert_eq!(filter_mapped[5], Err("8"));
+}
+
+#[test]
+fn test_filter_map_err() {
+    use std::str::FromStr;
+
+    let filter_mapped: Vec<_> = vec![
+        Ok("1"),
+        Err("2"),
+        Ok("a"),
+        Err("4"),
+        Ok("5"),
+        Err("b"),
+        Err("8"),
+    ].into_iter()
+        .filter_map_err(|txt| usize::from_str(txt).ok())
+        .collect();
+
+    assert_eq!(filter_mapped[0], Ok("1"));
+    assert_eq!(filter_mapped[1], Err(2));
+    assert_eq!(filter_mapped[2], Ok("a"));
+    assert_eq!(filter_mapped[3], Err(4));
+    assert_eq!(filter_mapped[4], Ok("5"));
+    assert_eq!(filter_mapped[5], Err(8));
 }
 
 #[test]
