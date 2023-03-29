@@ -34,6 +34,29 @@ where
     Self: Iterator<Item = Result<Option<T>, E>> + Sized,
     F: Fn() -> E,
 {
+    /// Map option inside an ok result, fail with the else-value if None
+    ///
+    /// ```
+    /// use resiter::ok_or_else::IterInnerOkOrElse;
+    ///
+    /// let v: Vec<Result<Option<i32>, &'static str>> = vec![
+    ///     Ok(Some(1)),
+    ///     Err("untouched err"),
+    ///     Ok(None),
+    ///     Ok(Some(4))];
+    ///
+    /// let res: Vec<Result<i32, &'static str>> = v.into_iter()
+    ///     .map_inner_ok_or_else(|| "error message")
+    ///     .collect();
+    ///
+    /// assert_eq!(
+    ///     res,
+    ///     vec![
+    ///        Ok(1),
+    ///        Err("untouched err"),
+    ///        Err("error message"),
+    ///        Ok(4)])
+    /// ```
     fn map_inner_ok_or_else(self, f: F) -> IterInnerOkOrElseImpl<Self, T, E, F>;
 }
 
@@ -70,17 +93,6 @@ where
             .next()
             .map(|e| e.and_then(|opt| opt.ok_or_else(|| (self.1)())))
     }
-}
-
-#[test]
-fn test_unwrap_optional_values() {
-    let v: Vec<Option<i32>> = vec![Some(1), Some(2), None, Some(4)];
-    let res: Vec<Result<i32, &'static str>> = v.into_iter()
-        .map(Ok)
-        .map_inner_ok_or_else(|| "error message")
-        .collect();
-
-    assert_eq!(res, vec![Ok(1), Ok(2), Err("error message"), Ok(4)])
 }
 
 #[test]
