@@ -17,6 +17,20 @@ pub use util::Process as Errors;
 /// Extension trait for `Iterator<Item = Result<T, E>>` to get all `E`s
 #[allow(clippy::type_complexity)]
 pub trait GetErrors<T, E>: Sized {
+    /// Get all errors from this `Iterator`
+    ///
+    /// ```
+    /// use std::str::FromStr;
+    /// use resiter::GetErrors;
+    ///
+    /// let res: Vec<std::num::ParseIntError> = ["1", "2", "a", "4", "b"]
+    ///     .iter()
+    ///     .map(|e| usize::from_str(e))
+    ///     .errors()
+    ///     .collect();
+    ///
+    /// assert_eq!(res.len(), 2);
+    /// ```
     fn errors(self) -> FilterMap<Self, fn(Result<T, E>) -> Option<E>>;
 }
 
@@ -28,16 +42,4 @@ where
     fn errors(self) -> FilterMap<Self, fn(Result<T, E>) -> Option<E>> {
         self.filter_map(GetErr::get_err)
     }
-}
-
-#[test]
-fn test_collect_only_errors() {
-    use std::str::FromStr;
-
-    let res: Vec<std::num::ParseIntError> = ["1", "2", "a", "4", "b"]
-        .iter()
-        .map(|e| usize::from_str(e))
-        .errors()
-        .collect();
-    assert_eq!(res.len(), 2);
 }
