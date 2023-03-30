@@ -31,15 +31,13 @@ where
 }
 
 #[test]
-fn test_compile() {
+fn test_collect_only_errors() {
     use std::str::FromStr;
 
-    let _: Result<_, ::std::num::ParseIntError> = ["1", "2", "3", "4", "5"]
+    let res: Vec<std::num::ParseIntError> = ["1", "2", "a", "4", "b"]
         .iter()
         .map(|e| usize::from_str(e))
         .errors()
-        .process(|e| {
-            println!("Error: {:?}", e);
-            Ok(())
-        });
+        .collect();
+    assert_eq!(res.len(), 2);
 }
