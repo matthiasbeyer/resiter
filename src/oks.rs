@@ -17,6 +17,23 @@ pub use util::Process as Oks;
 /// Extension trait for `Iterator<Item = Result<T, E>>` to get all `T`s
 #[allow(clippy::type_complexity)]
 pub trait GetOks<T, E>: Sized {
+    /// Iterate over every `Ok` while ignoring every `Err`
+    ///
+    /// ```
+    /// use std::str::FromStr;
+    /// use resiter::oks::GetOks;
+    ///
+    /// let res:Vec<usize> = ["1", "2", "3", "a", "4", "5"]
+    ///     .iter()
+    ///     .map(|e| usize::from_str(e))
+    ///     .oks()
+    ///     .collect();
+    ///
+    /// assert_eq!(
+    ///     res,
+    ///     vec![1,2,3,4,5]
+    /// );
+    /// ```
     fn oks(self) -> FilterMap<Self, fn(Result<T, E>) -> Option<T>>;
 }
 
@@ -28,18 +45,4 @@ where
     fn oks(self) -> FilterMap<Self, fn(Result<T, E>) -> Option<T>> {
         self.filter_map(GetOk::get_ok)
     }
-}
-
-#[test]
-fn test_compile() {
-    use std::str::FromStr;
-
-    let _: Result<_, ::std::num::ParseIntError> = ["1", "2", "3", "4", "5"]
-        .iter()
-        .map(|e| usize::from_str(e))
-        .oks()
-        .process(|o| {
-            println!("Ok: {:?}", o);
-            Ok(())
-        });
 }
