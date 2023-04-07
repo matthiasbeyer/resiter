@@ -12,7 +12,7 @@ pub trait AndThen<O, E>: Sized {
     ///
     /// let mapped: Vec<_> = ["1", "2", "a", "b", "4", "5"]
     ///     .iter()
-    ///     .map(|txt| usize::from_str(txt).map_err(|e| (txt, e)))
+    ///     .map(|txt| usize::from_str(txt))
     ///     .and_then_ok(|i| Ok(2 * i))
     ///     .collect();
     ///
