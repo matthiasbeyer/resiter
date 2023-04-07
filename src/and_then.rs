@@ -94,13 +94,30 @@ fn test_and_then_ok() {
         .iter()
         .map(|txt| usize::from_str(txt).map_err(|e| (txt, e)))
         .and_then_ok(|i| Ok(2 * i))
-        .and_then_err(|(txt, e)| if txt == &"a" { Ok(15) } else { Err(e) })
         .collect();
 
     assert_eq!(mapped[0], Ok(2));
     assert_eq!(mapped[1], Ok(4));
-    assert_eq!(mapped[2], Ok(15));
+    assert!(mapped[2].is_err());
     assert!(mapped[3].is_err());
     assert_eq!(mapped[4], Ok(8));
     assert_eq!(mapped[5], Ok(10));
+}
+
+#[test]
+fn test_and_then_err() {
+    use std::str::FromStr;
+
+    let mapped: Vec<_> = ["1", "2", "a", "b", "4", "5"]
+        .iter()
+        .map(|txt| usize::from_str(txt).map_err(|e| (txt, e)))
+        .and_then_err(|(txt, e)| if txt == &"a" { Ok(15) } else { Err(e) })
+        .collect();
+
+    assert_eq!(mapped[0], Ok(1));
+    assert_eq!(mapped[1], Ok(2));
+    assert_eq!(mapped[2], Ok(15));
+    assert!(mapped[3].is_err());
+    assert_eq!(mapped[4], Ok(4));
+    assert_eq!(mapped[5], Ok(5));
 }
