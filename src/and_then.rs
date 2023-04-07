@@ -6,9 +6,44 @@
 
 /// Extension trait for `Iterator<Item = Result<O, E>>` to selectively transform Oks and Errors.
 pub trait AndThen<O, E>: Sized {
+    /// ```
+    /// use resiter::and_then::AndThen;
+    /// use std::str::FromStr;
+    ///
+    /// let mapped: Vec<_> = ["1", "2", "a", "b", "4", "5"]
+    ///     .iter()
+    ///     .map(|txt| usize::from_str(txt).map_err(|e| (txt, e)))
+    ///     .and_then_ok(|i| Ok(2 * i))
+    ///     .collect();
+    ///
+    /// assert_eq!(mapped[0], Ok(2));
+    /// assert_eq!(mapped[1], Ok(4));
+    /// assert!(mapped[2].is_err());
+    /// assert!(mapped[3].is_err());
+    /// assert_eq!(mapped[4], Ok(8));
+    /// assert_eq!(mapped[5], Ok(10));
+    /// ```
     fn and_then_ok<F, O2>(self, _: F) -> AndThenOk<Self, F>
     where
         F: FnMut(O) -> Result<O2, E>;
+
+    /// ```
+    /// use resiter::and_then::AndThen;
+    /// use std::str::FromStr;
+    ///
+    /// let mapped: Vec<_> = ["1", "2", "a", "b", "4", "5"]
+    ///     .iter()
+    ///     .map(|txt| usize::from_str(txt).map_err(|e| (txt, e)))
+    ///     .and_then_err(|(txt, e)| if txt == &"a" { Ok(15) } else { Err(e) })
+    ///     .collect();
+    ///
+    /// assert_eq!(mapped[0], Ok(1));
+    /// assert_eq!(mapped[1], Ok(2));
+    /// assert_eq!(mapped[2], Ok(15));
+    /// assert!(mapped[3].is_err());
+    /// assert_eq!(mapped[4], Ok(4));
+    /// assert_eq!(mapped[5], Ok(5));
+    /// ```
     fn and_then_err<F, E2>(self, _: F) -> AndThenErr<Self, F>
     where
         F: FnMut(E) -> Result<O, E2>;
@@ -84,40 +119,4 @@ where
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.iter.size_hint()
     }
-}
-
-#[test]
-fn test_and_then_ok() {
-    use std::str::FromStr;
-
-    let mapped: Vec<_> = ["1", "2", "a", "b", "4", "5"]
-        .iter()
-        .map(|txt| usize::from_str(txt).map_err(|e| (txt, e)))
-        .and_then_ok(|i| Ok(2 * i))
-        .collect();
-
-    assert_eq!(mapped[0], Ok(2));
-    assert_eq!(mapped[1], Ok(4));
-    assert!(mapped[2].is_err());
-    assert!(mapped[3].is_err());
-    assert_eq!(mapped[4], Ok(8));
-    assert_eq!(mapped[5], Ok(10));
-}
-
-#[test]
-fn test_and_then_err() {
-    use std::str::FromStr;
-
-    let mapped: Vec<_> = ["1", "2", "a", "b", "4", "5"]
-        .iter()
-        .map(|txt| usize::from_str(txt).map_err(|e| (txt, e)))
-        .and_then_err(|(txt, e)| if txt == &"a" { Ok(15) } else { Err(e) })
-        .collect();
-
-    assert_eq!(mapped[0], Ok(1));
-    assert_eq!(mapped[1], Ok(2));
-    assert_eq!(mapped[2], Ok(15));
-    assert!(mapped[3].is_err());
-    assert_eq!(mapped[4], Ok(4));
-    assert_eq!(mapped[5], Ok(5));
 }
