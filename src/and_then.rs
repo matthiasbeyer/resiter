@@ -6,6 +6,8 @@
 
 /// Extension trait for `Iterator<Item = Result<O, E>>` to selectively transform Oks and Errors.
 pub trait AndThen<O, E>: Sized {
+    /// Map oks selectively, possibly converting them to errors
+    ///
     /// ```
     /// use resiter::and_then::AndThen;
     /// use std::str::FromStr;
@@ -27,6 +29,8 @@ pub trait AndThen<O, E>: Sized {
     where
         F: FnMut(O) -> Result<O2, E>;
 
+    /// Map errors selectively, possibly converting them to Oks
+    ///
     /// ```
     /// use resiter::and_then::AndThen;
     /// use std::str::FromStr;
