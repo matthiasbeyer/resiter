@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.0
+
+* More filters were added
+* More examples were added
+* Doc tests were added
+
+For a detailed changelog, please have a look at the git log.
+
 ## 0.4.0
 
 * Add `map_inner_ok_or_else()` which can be used to transform:
