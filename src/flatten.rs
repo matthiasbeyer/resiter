@@ -124,21 +124,27 @@ fn test_flatten_ok() {
         .map_ok(|i| (0..i))
         .map_err(|i| 0..(i * 2))
         .flatten_ok()
+        .collect();
+
+    assert_eq!(
+        mapped,
+        [Ok(0), Ok(0), Ok(1), Err(0..4), Err(0..0), Ok(0), Ok(1)]
+    );
+}
+
+#[test]
+fn test_flatten_err() {
+    use map::Map;
+
+    let mapped: Vec<_> = vec![Ok(1), Ok(2), Err(2), Err(0), Ok(2)]
+        .into_iter()
+        .map_ok(|i| (0..i))
+        .map_err(|i| 0..(i * 2))
         .flatten_err()
         .collect();
 
     assert_eq!(
         mapped,
-        [
-            Ok(0),
-            Ok(0),
-            Ok(1),
-            Err(0),
-            Err(1),
-            Err(2),
-            Err(3),
-            Ok(0),
-            Ok(1)
-        ]
+        [Ok(0..1), Ok(0..2), Err(0), Err(1), Err(2), Err(3), Ok(0..2),]
     );
 }
