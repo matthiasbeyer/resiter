@@ -10,6 +10,22 @@ pub trait FlatMap<O, E>: Sized {
     where
         F: FnMut(O) -> U,
         U: IntoIterator<Item = O2>;
+
+    /// [flat_map](Iterator::flat_map) every `Err` value and leave all `Ok` as is
+    ///
+    /// ```
+    /// use resiter::flat_map::FlatMap;
+    ///
+    /// let mapped: Vec<_> = vec![Ok(1), Ok(2), Err(2), Err(0), Ok(2)]
+    ///     .into_iter()
+    ///     .flat_map_err(|i| 0..(i * 2))
+    ///     .collect();
+    ///
+    /// assert_eq!(
+    ///     mapped,
+    ///     [Ok(1), Ok(2), Err(0), Err(1), Err(2), Err(3), Ok(2)]
+    /// );
+    /// ```
     fn flat_map_err<U, F, E2>(self, _: F) -> FlatMapErr<Self, U, F>
     where
         F: FnMut(E) -> U,
@@ -133,17 +149,4 @@ fn test_flat_map_ok() {
         .collect();
 
     assert_eq!(mapped, [Ok(0), Ok(0), Ok(1), Err(2), Err(0), Ok(0), Ok(1)]);
-}
-
-#[test]
-fn test_flat_map_err() {
-    let mapped: Vec<_> = vec![Ok(1), Ok(2), Err(2), Err(0), Ok(2)]
-        .into_iter()
-        .flat_map_err(|i| 0..(i * 2))
-        .collect();
-
-    assert_eq!(
-        mapped,
-        [Ok(1), Ok(2), Err(0), Err(1), Err(2), Err(3), Ok(2)]
-    );
 }
