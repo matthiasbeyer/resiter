@@ -90,6 +90,7 @@ fn test_map_ok() {
 
     assert_eq!(mapped[0], Ok(2));
     assert_eq!(mapped[1], Ok(4));
+    assert!(mapped[2].is_err());
     assert_eq!(mapped[3], Ok(8));
     assert_eq!(mapped[4], Ok(10));
 }
@@ -118,8 +119,14 @@ fn test_map_err() {
         .collect();
 
     assert_eq!(
-        mapped[2],
-        Err("ParseIntError { kind: InvalidDigit }".to_string())
+        mapped,
+        vec![
+            Ok(1),
+            Ok(2),
+            Err("ParseIntError { kind: InvalidDigit }".to_string()),
+            Ok(4),
+            Ok(5),
+        ]
     );
 }
 
