@@ -111,9 +111,9 @@ fn test_filter_ok() {
         .map(|txt| usize::from_str(txt))
         .filter_ok(|i| i % 2 == 0)
         .collect();
-
     assert_eq!(mapped.len(), 3);
     assert_eq!(mapped[0], Ok(2));
+    assert!(mapped[1].is_err());
     assert_eq!(mapped[2], Ok(4))
 }
 
