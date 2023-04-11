@@ -16,6 +16,21 @@ where
     I: Iterator<Item = Result<O, E>>,
     F: FnMut(&O),
 {
+    /// Perform a side effect on each Ok value
+    ///
+    /// ```
+    /// use resiter::onok::OnOkDo;
+    /// use std::str::FromStr;
+    ///
+    /// let mut oks = Vec::new();
+    /// let _: Vec<Result<usize, ::std::num::ParseIntError>> = ["1", "2", "a", "b", "5"]
+    ///     .iter()
+    ///     .map(|e| usize::from_str(e))
+    ///     .on_ok(|e| oks.push(e.to_owned()))
+    ///     .collect();
+    ///
+    /// assert_eq!(oks, vec![1, 2, 5]);
+    /// ```
     fn on_ok(self, _: F) -> OnOk<I, O, E, F>;
 }
 
@@ -44,18 +59,4 @@ where
             })
         })
     }
-}
-
-#[test]
-fn test_compile_1() {
-    use std::str::FromStr;
-    let mut oks = Vec::new();
-
-    let _: Vec<Result<usize, ::std::num::ParseIntError>> = ["1", "2", "a", "b", "5"]
-        .iter()
-        .map(|e| usize::from_str(e))
-        .on_ok(|e| oks.push(e.to_owned()))
-        .collect();
-
-    assert_eq!(oks, vec![1, 2, 5]);
 }
