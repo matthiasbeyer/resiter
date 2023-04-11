@@ -16,6 +16,23 @@ where
     I: Iterator<Item = Result<O, E>>,
     F: FnMut(&E),
 {
+    /// Apply a sideffect on each `Err`
+    ///
+    /// ```
+    /// use resiter::onerr::OnErrDo;
+    /// use std::str::FromStr;
+    /// let mut errs = Vec::<::std::num::ParseIntError>::new();
+    ///
+    /// let _: Vec<Result<usize, ::std::num::ParseIntError>> = ["1", "2", "a", "b", "5"]
+    ///     .iter()
+    ///     .map(|e| usize::from_str(e))
+    ///     .on_err(|e| {
+    ///         errs.push(e.to_owned())
+    ///     })
+    ///     .collect();
+    ///
+    /// assert_eq!(errs.len(), 2);
+    /// ```
     fn on_err(self, _: F) -> OnErr<I, O, E, F>;
 }
 
@@ -44,15 +61,4 @@ where
             })
         })
     }
-}
-
-#[test]
-fn test_compile_1() {
-    use std::str::FromStr;
-
-    let _: Vec<Result<usize, ::std::num::ParseIntError>> = ["1", "2", "3", "4", "5"]
-        .iter()
-        .map(|e| usize::from_str(e))
-        .on_err(|e| println!("Error: {:?}", e))
-        .collect();
 }
