@@ -6,6 +6,22 @@
 
 /// Extension trait for `Iterator<Item = Result<O, E>>` to filter one kind of result (and leaving the other as is)
 pub trait Filter<O, E>: Sized {
+    /// Filter `Ok` items and leaves `Err` as is
+    ///
+    /// ```
+    /// use resiter::filter::Filter;
+    /// use std::str::FromStr;
+    ///
+    /// let mapped: Vec<_> = ["1", "2", "a", "4", "5"]
+    ///     .iter()
+    ///     .map(|txt| usize::from_str(txt))
+    ///     .filter_ok(|i| i % 2 == 0)
+    ///     .collect();
+    /// assert_eq!(mapped.len(), 3);
+    /// assert_eq!(mapped[0], Ok(2));
+    /// assert!(mapped[1].is_err());
+    /// assert_eq!(mapped[2], Ok(4))
+    /// ```
     fn filter_ok<F>(self, _: F) -> FilterOk<Self, F>
     where
         F: FnMut(&O) -> bool;
@@ -100,21 +116,6 @@ where
         let hint_sup = self.iter.size_hint().1;
         (0, hint_sup)
     }
-}
-
-#[test]
-fn test_filter_ok() {
-    use std::str::FromStr;
-
-    let mapped: Vec<_> = ["1", "2", "a", "4", "5"]
-        .iter()
-        .map(|txt| usize::from_str(txt))
-        .filter_ok(|i| i % 2 == 0)
-        .collect();
-    assert_eq!(mapped.len(), 3);
-    assert_eq!(mapped[0], Ok(2));
-    assert!(mapped[1].is_err());
-    assert_eq!(mapped[2], Ok(4))
 }
 
 #[test]
