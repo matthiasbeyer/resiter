@@ -130,21 +130,20 @@ fn test_flat_map_ok() {
     let mapped: Vec<_> = vec![Ok(1), Ok(2), Err(2), Err(0), Ok(2)]
         .into_iter()
         .flat_map_ok(|i| (0..i))
+        .collect();
+
+    assert_eq!(mapped, [Ok(0), Ok(0), Ok(1), Err(2), Err(0), Ok(0), Ok(1)]);
+}
+
+#[test]
+fn test_flat_map_err() {
+    let mapped: Vec<_> = vec![Ok(1), Ok(2), Err(2), Err(0), Ok(2)]
+        .into_iter()
         .flat_map_err(|i| 0..(i * 2))
         .collect();
 
     assert_eq!(
         mapped,
-        [
-            Ok(0),
-            Ok(0),
-            Ok(1),
-            Err(0),
-            Err(1),
-            Err(2),
-            Err(3),
-            Ok(0),
-            Ok(1)
-        ]
+        [Ok(1), Ok(2), Err(0), Err(1), Err(2), Err(3), Ok(2)]
     );
 }
