@@ -27,6 +27,29 @@ pub trait Map<O, E>: Sized {
     fn map_ok<F, O2>(self, _: F) -> MapOk<Self, F>
     where
         F: FnMut(O) -> O2;
+
+    /// Map all `Err` items while leaving `Ok` as is
+    ///
+    /// ```
+    /// use resiter::map::Map;
+    /// use std::str::FromStr;
+    /// let mapped: Vec<_> = ["1", "2", "a", "4", "5"]
+    ///     .iter()
+    ///     .map(|txt| usize::from_str(txt))
+    ///     .map_err(|e| format!("{:?}", e))
+    ///     .collect();
+    ///
+    /// assert_eq!(
+    ///     mapped,
+    ///     vec![
+    ///         Ok(1),
+    ///         Ok(2),
+    ///         Err("ParseIntError { kind: InvalidDigit }".to_string()),
+    ///         Ok(4),
+    ///         Ok(5),
+    ///     ]
+    /// );
+    /// ```
     fn map_err<F, E2>(self, _: F) -> MapErr<Self, F>
     where
         F: FnMut(E) -> E2;
@@ -107,28 +130,6 @@ fn test_map_ok_hint() {
         .size_hint();
 
     assert_eq!(hint, (5, Some(5)));
-}
-
-#[test]
-fn test_map_err() {
-    use std::str::FromStr;
-
-    let mapped: Vec<_> = ["1", "2", "a", "4", "5"]
-        .iter()
-        .map(|txt| usize::from_str(txt))
-        .map_err(|e| format!("{:?}", e))
-        .collect();
-
-    assert_eq!(
-        mapped,
-        vec![
-            Ok(1),
-            Ok(2),
-            Err("ParseIntError { kind: InvalidDigit }".to_string()),
-            Ok(4),
-            Ok(5),
-        ]
-    );
 }
 
 #[test]
