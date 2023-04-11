@@ -6,7 +6,7 @@
 
 /// Extension trait for `Iterator<Item = Result<O, E>>` to filter one kind of result (and leaving the other as is)
 pub trait Filter<O, E>: Sized {
-    /// Filter `Ok` items and leaves `Err` as is
+    /// Filter `Ok` items while keeping `Err`
     ///
     /// ```
     /// use resiter::filter::Filter;
@@ -25,6 +25,21 @@ pub trait Filter<O, E>: Sized {
     fn filter_ok<F>(self, _: F) -> FilterOk<Self, F>
     where
         F: FnMut(&O) -> bool;
+
+    /// Filter `Err` values while keeping `Ok`
+    ///
+    /// ```
+    /// use resiter::filter::Filter;
+    /// use std::str::FromStr;
+    ///
+    /// let mapped: Vec<_> = ["1", "2", "a", "4", "5"]
+    ///     .iter()
+    ///     .map(|txt| usize::from_str(txt))
+    ///     .filter_err(|_| false)
+    ///     .collect();
+    ///
+    /// assert_eq!(mapped, vec![Ok(1), Ok(2), Ok(4), Ok(5)]);
+    /// ```
     fn filter_err<F>(self, _: F) -> FilterErr<Self, F>
     where
         F: FnMut(&E) -> bool;
@@ -129,19 +144,6 @@ fn test_filter_ok_hint() {
         .size_hint();
 
     assert_eq!(hint, (0, Some(5)));
-}
-
-#[test]
-fn test_filter_err() {
-    use std::str::FromStr;
-
-    let mapped: Vec<_> = ["1", "2", "a", "4", "5"]
-        .iter()
-        .map(|txt| usize::from_str(txt))
-        .filter_err(|_| false)
-        .collect();
-
-    assert_eq!(mapped, vec![Ok(1), Ok(2), Ok(4), Ok(5)]);
 }
 
 #[test]
