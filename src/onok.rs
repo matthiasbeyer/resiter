@@ -49,10 +49,13 @@ where
 #[test]
 fn test_compile_1() {
     use std::str::FromStr;
+    let mut oks = Vec::new();
 
-    let _: Vec<Result<usize, ::std::num::ParseIntError>> = ["1", "2", "3", "4", "5"]
+    let _: Vec<Result<usize, ::std::num::ParseIntError>> = ["1", "2", "a", "b", "5"]
         .iter()
         .map(|e| usize::from_str(e))
-        .on_ok(|e| println!("Ok: {:?}", e))
+        .on_ok(|e| oks.push(e.to_owned()))
         .collect();
+
+    assert_eq!(oks, vec![1, 2, 5]);
 }
