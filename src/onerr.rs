@@ -21,8 +21,8 @@ where
     /// ```
     /// use resiter::onerr::OnErrDo;
     /// use std::str::FromStr;
-    /// let mut errs = Vec::<::std::num::ParseIntError>::new();
     ///
+    /// let mut errs = Vec::<::std::num::ParseIntError>::new();
     /// let _: Vec<Result<usize, ::std::num::ParseIntError>> = ["1", "2", "a", "b", "5"]
     ///     .iter()
     ///     .map(|e| usize::from_str(e))
