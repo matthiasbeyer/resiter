@@ -59,12 +59,14 @@ where
 }
 
 #[test]
-fn test_compile_1() {
+fn test_ignore_errors() {
     use std::str::FromStr;
 
-    let _: Vec<usize> = ["1", "2", "3", "4", "5"]
+    let unwrapped: Vec<usize> = ["1", "2", "a", "b", "5"]
         .iter()
         .map(|e| usize::from_str(e))
         .unwrap_with(|_| None) // ignore errors
         .collect();
+
+    assert_eq!(unwrapped, vec![1, 2, 5],);
 }
