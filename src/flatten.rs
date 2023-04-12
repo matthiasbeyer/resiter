@@ -6,9 +6,53 @@
 
 /// Extension trait for `Iterator<Item = Result<O, E>>` to selectively transform Oks and Errors.
 pub trait Flatten<O, E>: Sized {
+    /// [flatten](Iterator::flatten) `Ok` values while leaving `Err`-values as is.
+    ///
+    /// ```
+    /// use resiter::flatten::Flatten;
+    /// use resiter::map::Map;
+    ///
+    /// let mapped: Vec<_> = vec![Ok(1), Ok(2), Err(2), Err(0), Ok(2)]
+    ///     .into_iter()
+    ///     .map_ok(|i| (0..i))
+    ///     .map_err(|i| 0..(i * 2))
+    ///     .flatten_ok()
+    ///     .collect();
+    ///
+    /// assert_eq!(
+    ///     mapped,
+    ///     [Ok(0), Ok(0), Ok(1), Err(0..4), Err(0..0), Ok(0), Ok(1)]
+    /// );
+    /// ```
     fn flatten_ok<U, O2>(self) -> FlattenOk<Self, U>
     where
         U: IntoIterator<Item = O2>;
+    /// [flatten](Iterator::flatten) `Err` values while leaving `Ok`-values as is.
+    ///
+    /// ```
+    /// use resiter::flatten::Flatten;
+    /// use resiter::map::Map;
+    ///
+    /// let mapped: Vec<_> = vec![Ok(1), Ok(2), Err(2), Err(0), Ok(2)]
+    ///     .into_iter()
+    ///     .map_ok(|i| (0..i))
+    ///     .map_err(|i| 0..(i * 2))
+    ///     .flatten_err()
+    ///     .collect();
+    ///
+    /// assert_eq!(
+    ///     mapped,
+    ///     [
+    ///         Ok(0..1),
+    ///         Ok(0..2),
+    ///         Err(0),
+    ///         Err(1),
+    ///         Err(2),
+    ///         Err(3),
+    ///         Ok(0..2),
+    ///     ]
+    /// );
+    /// ```
     fn flatten_err<U, E2>(self) -> FlattenErr<Self, U>
     where
         U: IntoIterator<Item = E2>;
@@ -113,32 +157,4 @@ where
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.iter.size_hint()
     }
-}
-
-#[test]
-fn test_flatten_ok() {
-    use map::Map;
-
-    let mapped: Vec<_> = vec![Ok(1), Ok(2), Err(2), Err(0), Ok(2)]
-        .into_iter()
-        .map_ok(|i| (0..i))
-        .map_err(|i| 0..(i * 2))
-        .flatten_ok()
-        .flatten_err()
-        .collect();
-
-    assert_eq!(
-        mapped,
-        [
-            Ok(0),
-            Ok(0),
-            Ok(1),
-            Err(0),
-            Err(1),
-            Err(2),
-            Err(3),
-            Ok(0),
-            Ok(1)
-        ]
-    );
 }
