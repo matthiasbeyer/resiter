@@ -70,3 +70,16 @@ fn test_ignore_errors() {
 
     assert_eq!(unwrapped, vec![1, 2, 5],);
 }
+
+#[test]
+fn test_convert_errors() {
+    use std::str::FromStr;
+
+    let unwrapped: Vec<usize> = ["1", "2", "a", "b", "5"]
+        .iter()
+        .map(|e| usize::from_str(e))
+        .unwrap_with(|_| Some(8)) // convert errors
+        .collect();
+
+    assert_eq!(unwrapped, vec![1, 2, 8, 8, 5],);
+}
