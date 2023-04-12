@@ -45,6 +45,35 @@ where
     I: Iterator<Item = Result<O, E>>,
     F: FnMut(E) -> Option<O>,
 {
+    /// Unwraps all results
+    ///
+    /// Errors can be ignored:
+    /// ```
+    /// use resiter::unwrap::UnwrapWithExt;
+    /// use std::str::FromStr;
+    ///
+    /// let unwrapped: Vec<usize> = ["1", "2", "a", "b", "5"]
+    ///     .iter()
+    ///     .map(|e| usize::from_str(e))
+    ///     .unwrap_with(|_| None) // ignore errors
+    ///     .collect();
+    ///
+    /// assert_eq!(unwrapped, vec![1, 2, 5],);
+    /// ```
+    ///
+    /// Or simply converted:
+    /// ```
+    /// use resiter::unwrap::UnwrapWithExt;
+    /// use std::str::FromStr;
+    ///
+    /// let unwrapped: Vec<usize> = ["1", "2", "a", "b", "5"]
+    ///     .iter()
+    ///     .map(|e| usize::from_str(e))
+    ///     .unwrap_with(|_| Some(8)) // convert errors
+    ///     .collect();
+    ///
+    /// assert_eq!(unwrapped, vec![1, 2, 8, 8, 5],);
+    /// ```
     fn unwrap_with(self, _: F) -> UnwrapWith<I, O, E, F>;
 }
 
@@ -56,15 +85,4 @@ where
     fn unwrap_with(self, f: F) -> UnwrapWith<I, O, E, F> {
         UnwrapWith(self, f)
     }
-}
-
-#[test]
-fn test_compile_1() {
-    use std::str::FromStr;
-
-    let _: Vec<usize> = ["1", "2", "3", "4", "5"]
-        .iter()
-        .map(|e| usize::from_str(e))
-        .unwrap_with(|_| None) // ignore errors
-        .collect();
 }
