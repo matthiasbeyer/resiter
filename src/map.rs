@@ -6,9 +6,50 @@
 
 /// Extension trait for `Iterator<Item = Result<O, E>>` to selectively transform Oks and Errors.
 pub trait Map<O, E>: Sized {
+    /// Map all `Ok` items while leaving `Err` as is
+    ///
+    /// ```
+    /// use resiter::map::Map;
+    /// use std::str::FromStr;
+    ///
+    /// let mapped: Vec<_> = ["1", "2", "a", "4", "5"]
+    ///     .iter()
+    ///     .map(|txt| usize::from_str(txt))
+    ///     .map_ok(|i| 2 * i)
+    ///     .collect();
+    ///
+    /// assert_eq!(mapped[0], Ok(2));
+    /// assert_eq!(mapped[1], Ok(4));
+    /// assert!(mapped[2].is_err());
+    /// assert_eq!(mapped[3], Ok(8));
+    /// assert_eq!(mapped[4], Ok(10));
+    /// ```
     fn map_ok<F, O2>(self, _: F) -> MapOk<Self, F>
     where
         F: FnMut(O) -> O2;
+
+    /// Map all `Err` items while leaving `Ok` as is
+    ///
+    /// ```
+    /// use resiter::map::Map;
+    /// use std::str::FromStr;
+    /// let mapped: Vec<_> = ["1", "2", "a", "4", "5"]
+    ///     .iter()
+    ///     .map(|txt| usize::from_str(txt))
+    ///     .map_err(|e| format!("{:?}", e))
+    ///     .collect();
+    ///
+    /// assert_eq!(
+    ///     mapped,
+    ///     vec![
+    ///         Ok(1),
+    ///         Ok(2),
+    ///         Err("ParseIntError { kind: InvalidDigit }".to_string()),
+    ///         Ok(4),
+    ///         Ok(5),
+    ///     ]
+    /// );
+    /// ```
     fn map_err<F, E2>(self, _: F) -> MapErr<Self, F>
     where
         F: FnMut(E) -> E2;
@@ -79,22 +120,6 @@ where
 }
 
 #[test]
-fn test_map_ok() {
-    use std::str::FromStr;
-
-    let mapped: Vec<_> = ["1", "2", "a", "4", "5"]
-        .iter()
-        .map(|txt| usize::from_str(txt))
-        .map_ok(|i| 2 * i)
-        .collect();
-
-    assert_eq!(mapped[0], Ok(2));
-    assert_eq!(mapped[1], Ok(4));
-    assert_eq!(mapped[3], Ok(8));
-    assert_eq!(mapped[4], Ok(10));
-}
-
-#[test]
 fn test_map_ok_hint() {
     use std::str::FromStr;
 
@@ -105,22 +130,6 @@ fn test_map_ok_hint() {
         .size_hint();
 
     assert_eq!(hint, (5, Some(5)));
-}
-
-#[test]
-fn test_map_err() {
-    use std::str::FromStr;
-
-    let mapped: Vec<_> = ["1", "2", "a", "4", "5"]
-        .iter()
-        .map(|txt| usize::from_str(txt))
-        .map_err(|e| format!("{:?}", e))
-        .collect();
-
-    assert_eq!(
-        mapped[2],
-        Err("ParseIntError { kind: InvalidDigit }".to_string())
-    );
 }
 
 #[test]
