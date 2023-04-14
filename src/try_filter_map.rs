@@ -24,7 +24,7 @@ pub trait TryFilterMap<O, E>: Sized {
     ///     Err("8".to_owned()),
     /// ]
     /// .into_iter()
-    /// .try_filter_map(|txt| {
+    /// .try_filter_map_ok(|txt| {
     ///     match usize::from_str(txt).map_err(|e| e.to_string()) {
     ///         Err(e) => Some(Err(e)),
     ///         Ok(u) => {
@@ -50,7 +50,7 @@ pub trait TryFilterMap<O, E>: Sized {
     ///     ]
     /// );
     /// ```
-    fn try_filter_map<F, O2>(self, _: F) -> TryFilterMapOk<Self, F>
+    fn try_filter_map_ok<F, O2>(self, _: F) -> TryFilterMapOk<Self, F>
     where
         F: FnMut(O) -> Option<Result<O2, E>>;
 }
@@ -59,7 +59,7 @@ impl<I, O, E> TryFilterMap<O, E> for I
 where
     I: Iterator<Item = Result<O, E>> + Sized,
 {
-    fn try_filter_map<F, O2>(self, f: F) -> TryFilterMapOk<Self, F>
+    fn try_filter_map_ok<F, O2>(self, f: F) -> TryFilterMapOk<Self, F>
     where
         F: FnMut(O) -> Option<Result<O2, E>>,
     {
