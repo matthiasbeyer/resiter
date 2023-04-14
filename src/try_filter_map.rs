@@ -53,6 +53,53 @@ pub trait TryFilterMap<O, E>: Sized {
     fn try_filter_map_ok<F, O2>(self, _: F) -> TryFilterMapOk<Self, F>
     where
         F: FnMut(O) -> Option<Result<O2, E>>;
+
+    /// Equivalent to [Iterator::filter_map] on all `Err` values.
+    /// The filter function can fail with a result and turn a
+    /// [Result::Err] into a [Result::Ok]
+    ///
+    /// ```
+    /// use std::str::FromStr;
+    /// use resiter::try_filter_map::TryFilterMap;
+    ///
+    /// let filter_mapped: Vec<_> = vec![
+    ///     Ok("1".to_owned()),
+    ///     Err("2".to_owned()), // will become ok
+    ///     Ok("a".to_owned()),
+    ///     Err("4".to_owned()), // will be removed
+    ///     Ok("5".to_owned()),
+    ///     Err("b".to_owned()), // will be an error
+    ///     Err("8".to_owned()), // will be removed
+    /// ]
+    /// .into_iter()
+    /// .try_filter_map_err(|txt| {
+    ///     match usize::from_str(&txt).map_err(|e| e.to_string()) {
+    ///         Err(e) => Some(Err(e)),
+    ///         Ok(u) => {
+    ///             if u < 3 {
+    ///                 Some(Ok(u.to_string()))
+    ///             } else {
+    ///                 None
+    ///             }
+    ///         }
+    ///     }
+    /// })
+    /// .collect();
+    ///
+    /// assert_eq!(
+    ///     filter_mapped,
+    ///     [
+    ///         Ok("1".to_owned()),
+    ///         Ok("2".to_owned()),
+    ///         Ok("a".to_owned()),
+    ///         Ok("5".to_owned()),
+    ///         Err("invalid digit found in string".to_owned()),
+    ///     ]
+    /// );
+    /// ```
+    fn try_filter_map_err<F>(self, _: F) -> TryFilterMapErr<Self, F>
+    where
+        F: FnMut(E) -> Option<Result<O, E>>;
 }
 
 impl<I, O, E> TryFilterMap<O, E> for I
@@ -64,6 +111,13 @@ where
         F: FnMut(O) -> Option<Result<O2, E>>,
     {
         TryFilterMapOk { iter: self, f }
+    }
+
+    fn try_filter_map_err<F>(self, f: F) -> TryFilterMapErr<Self, F>
+    where
+        F: FnMut(E) -> Option<Result<O, E>>,
+    {
+        TryFilterMapErr { iter: self, f }
     }
 }
 
@@ -89,6 +143,37 @@ where
                 },
                 Some(Err(e)) => Some(Err(e)),
                 None => None,
+            };
+        }
+    }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        self.iter.size_hint()
+    }
+}
+
+#[must_use = "iterator adaptors are lazy and do nothing unless consumed"]
+pub struct TryFilterMapErr<I, F> {
+    iter: I,
+    f: F,
+}
+
+impl<I, O, E, F> Iterator for TryFilterMapErr<I, F>
+where
+    I: Iterator<Item = Result<O, E>>,
+    F: FnMut(E) -> Option<Result<O, E>>,
+{
+    type Item = Result<O, E>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        loop {
+            return match self.iter.next() {
+                Some(Err(x)) => match (self.f)(x) {
+                    Some(r) => Some(r),
+                    None => continue,
+                },
+                v => v,
             };
         }
     }
