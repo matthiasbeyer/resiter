@@ -59,12 +59,15 @@ impl<I, O, E> Map<O, E> for I
 where
     I: Iterator<Item = Result<O, E>> + Sized,
 {
+    #[inline]
     fn map_ok<F, O2>(self, f: F) -> MapOk<Self, F>
     where
         F: FnMut(O) -> O2,
     {
         MapOk { iter: self, f }
     }
+
+    #[inline]
     fn map_err<F, E2>(self, f: F) -> MapErr<Self, F>
     where
         F: FnMut(E) -> E2,
@@ -119,28 +122,33 @@ where
     }
 }
 
-#[test]
-fn test_map_ok_hint() {
-    use std::str::FromStr;
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-    let hint = ["1", "2", "a", "4", "5"]
-        .iter()
-        .map(|txt| usize::from_str(txt))
-        .map_ok(|i| 2 * i)
-        .size_hint();
+    #[test]
+    fn test_map_ok_hint() {
+        use std::str::FromStr;
 
-    assert_eq!(hint, (5, Some(5)));
-}
+        let hint = ["1", "2", "a", "4", "5"]
+            .iter()
+            .map(|txt| usize::from_str(txt))
+            .map_ok(|i| 2 * i)
+            .size_hint();
 
-#[test]
-fn test_map_err_hint() {
-    use std::str::FromStr;
+        assert_eq!(hint, (5, Some(5)));
+    }
 
-    let hint = ["1", "2", "a", "4", "5"]
-        .iter()
-        .map(|txt| usize::from_str(txt))
-        .map_err(|e| format!("{:?}", e))
-        .size_hint();
+    #[test]
+    fn test_map_err_hint() {
+        use std::str::FromStr;
 
-    assert_eq!(hint, (5, Some(5)));
+        let hint = ["1", "2", "a", "4", "5"]
+            .iter()
+            .map(|txt| usize::from_str(txt))
+            .map_err(|e| format!("{:?}", e))
+            .size_hint();
+
+        assert_eq!(hint, (5, Some(5)));
+    }
 }

@@ -49,12 +49,15 @@ impl<I, O, E> Filter<O, E> for I
 where
     I: Iterator<Item = Result<O, E>> + Sized,
 {
+    #[inline]
     fn filter_ok<F>(self, f: F) -> FilterOk<Self, F>
     where
         F: FnMut(&O) -> bool,
     {
         FilterOk { iter: self, f }
     }
+
+    #[inline]
     fn filter_err<F>(self, f: F) -> FilterErr<Self, F>
     where
         F: FnMut(&E) -> bool,
@@ -133,28 +136,33 @@ where
     }
 }
 
-#[test]
-fn test_filter_ok_hint() {
-    use std::str::FromStr;
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-    let hint = ["1", "2", "a", "4", "5"]
-        .iter()
-        .map(|txt| usize::from_str(txt))
-        .filter_ok(|i| i % 2 == 0)
-        .size_hint();
+    #[test]
+    fn test_filter_ok_hint() {
+        use std::str::FromStr;
 
-    assert_eq!(hint, (0, Some(5)));
-}
+        let hint = ["1", "2", "a", "4", "5"]
+            .iter()
+            .map(|txt| usize::from_str(txt))
+            .filter_ok(|i| i % 2 == 0)
+            .size_hint();
 
-#[test]
-fn test_filter_err_hint() {
-    use std::str::FromStr;
+        assert_eq!(hint, (0, Some(5)));
+    }
 
-    let hint = ["1", "2", "a", "4", "5"]
-        .iter()
-        .map(|txt| usize::from_str(txt))
-        .filter_err(|_| false)
-        .size_hint();
+    #[test]
+    fn test_filter_err_hint() {
+        use std::str::FromStr;
 
-    assert_eq!(hint, (0, Some(5)));
+        let hint = ["1", "2", "a", "4", "5"]
+            .iter()
+            .map(|txt| usize::from_str(txt))
+            .filter_err(|_| false)
+            .size_hint();
+
+        assert_eq!(hint, (0, Some(5)));
+    }
 }

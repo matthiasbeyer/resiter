@@ -39,6 +39,7 @@ where
     I: Iterator<Item = Result<O, E>>,
     F: FnMut(&O),
 {
+    #[inline]
     fn on_ok(self, f: F) -> OnOk<I, O, E, F> {
         OnOk(self, f)
     }

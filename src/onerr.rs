@@ -41,6 +41,7 @@ where
     I: Iterator<Item = Result<O, E>>,
     F: FnMut(&E),
 {
+    #[inline]
     fn on_err(self, f: F) -> OnErr<I, O, E, F> {
         OnErr(self, f)
     }

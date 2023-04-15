@@ -42,6 +42,7 @@ where
     /// assert_eq!(filter_mapped[4], Err("b"));
     /// assert_eq!(filter_mapped[5], Err("8"));
     /// ```
+    #[inline]
     fn filter_map_ok<F, O2>(self, f: F) -> FilterMapOk<Self, F>
     where
         F: FnMut(O) -> Option<O2>,
@@ -74,6 +75,7 @@ where
     /// assert_eq!(filter_mapped[4], Ok("5"));
     /// assert_eq!(filter_mapped[5], Err(8));
     /// ```
+    #[inline]
     fn filter_map_err<F, E2>(self, f: F) -> FilterMapErr<Self, F>
     where
         F: FnMut(E) -> Option<E2>,
@@ -147,28 +149,33 @@ where
     }
 }
 
-#[test]
-fn test_filter_map_ok_hint() {
-    use std::str::FromStr;
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-    let hint = ["1", "2", "a", "4", "5"]
-        .iter()
-        .map(|txt| usize::from_str(txt))
-        .filter_map_ok(|i| Some(2 * i))
-        .size_hint();
+    #[test]
+    fn test_filter_map_ok_hint() {
+        use std::str::FromStr;
 
-    assert_eq!(hint, (5, Some(5)));
-}
+        let hint = ["1", "2", "a", "4", "5"]
+            .iter()
+            .map(|txt| usize::from_str(txt))
+            .filter_map_ok(|i| Some(2 * i))
+            .size_hint();
 
-#[test]
-fn test_filter_map_err_hint() {
-    use std::str::FromStr;
+        assert_eq!(hint, (5, Some(5)));
+    }
 
-    let hint = ["1", "2", "a", "4", "5"]
-        .iter()
-        .map(|txt| usize::from_str(txt))
-        .filter_map_err(|e| Some(format!("{:?}", e)))
-        .size_hint();
+    #[test]
+    fn test_filter_map_err_hint() {
+        use std::str::FromStr;
 
-    assert_eq!(hint, (5, Some(5)));
+        let hint = ["1", "2", "a", "4", "5"]
+            .iter()
+            .map(|txt| usize::from_str(txt))
+            .filter_map_err(|e| Some(format!("{:?}", e)))
+            .size_hint();
+
+        assert_eq!(hint, (5, Some(5)));
+    }
 }

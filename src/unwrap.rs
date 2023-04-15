@@ -82,6 +82,7 @@ where
     I: Iterator<Item = Result<O, E>>,
     F: FnMut(E) -> Option<O>,
 {
+    #[inline]
     fn unwrap_with(self, f: F) -> UnwrapWith<I, O, E, F> {
         UnwrapWith(self, f)
     }

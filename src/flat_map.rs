@@ -47,6 +47,7 @@ impl<I, O, E> FlatMap<O, E> for I
 where
     I: Iterator<Item = Result<O, E>> + Sized,
 {
+    #[inline]
     fn flat_map_ok<U, F, O2>(self, f: F) -> FlatMapOk<Self, U, F>
     where
         F: FnMut(O) -> U,
@@ -58,6 +59,8 @@ where
             f,
         }
     }
+
+    #[inline]
     fn flat_map_err<U, F, E2>(self, f: F) -> FlatMapErr<Self, U, F>
     where
         F: FnMut(E) -> U,

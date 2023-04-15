@@ -41,6 +41,7 @@ impl<T, E, I> GetOks<T, E> for I
 where
     I: Iterator<Item = Result<T, E>> + Sized,
 {
+    #[inline]
     #[allow(clippy::type_complexity)]
     fn oks(self) -> FilterMap<Self, fn(Result<T, E>) -> Option<T>> {
         self.filter_map(GetOk::get_ok)

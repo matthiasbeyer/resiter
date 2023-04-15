@@ -33,6 +33,7 @@ impl<I, O, E> TryFilter<O, E> for I
 where
     I: Iterator<Item = Result<O, E>> + Sized,
 {
+    #[inline]
     fn try_filter_ok<F>(self, f: F) -> TryFilterOk<Self, F>
     where
         F: FnMut(&O) -> Result<bool, E>,

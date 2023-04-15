@@ -59,6 +59,7 @@ impl<I, O, E> AndThenFilter<O, E> for I
 where
     I: Iterator<Item = Result<O, E>> + Sized,
 {
+    #[inline]
     fn and_then_filter<F, O2>(self, f: F) -> AndThenFilterOk<Self, F>
     where
         F: FnMut(O) -> Option<Result<O2, E>>,

@@ -46,6 +46,7 @@ impl<I, O, E> WhileOk<O, E> for I
 where
     I: Iterator<Item = Result<O, E>>,
 {
+    #[inline]
     fn while_ok<F>(self, mut f: F) -> Result<(), E>
     where
         F: FnMut(O),

@@ -62,6 +62,7 @@ impl<I, O, E> Flatten<O, E> for I
 where
     I: Iterator<Item = Result<O, E>> + Sized,
 {
+    #[inline]
     fn flatten_ok<U, O2>(self) -> FlattenOk<Self, U>
     where
         U: IntoIterator<Item = O2>,
@@ -71,6 +72,8 @@ where
             iter: self,
         }
     }
+
+    #[inline]
     fn flatten_err<U, E2>(self) -> FlattenErr<Self, U>
     where
         U: IntoIterator<Item = E2>,

@@ -57,12 +57,15 @@ impl<I, O, E> AndThen<O, E> for I
 where
     I: Iterator<Item = Result<O, E>> + Sized,
 {
+    #[inline]
     fn and_then_ok<F, O2>(self, f: F) -> AndThenOk<Self, F>
     where
         F: FnMut(O) -> Result<O2, E>,
     {
         AndThenOk { iter: self, f }
     }
+
+    #[inline]
     fn and_then_err<F, E2>(self, f: F) -> AndThenErr<Self, F>
     where
         F: FnMut(E) -> Result<O, E2>,
