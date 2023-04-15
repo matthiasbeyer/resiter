@@ -147,28 +147,33 @@ where
     }
 }
 
-#[test]
-fn test_filter_map_ok_hint() {
-    use std::str::FromStr;
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-    let hint = ["1", "2", "a", "4", "5"]
-        .iter()
-        .map(|txt| usize::from_str(txt))
-        .filter_map_ok(|i| Some(2 * i))
-        .size_hint();
+    #[test]
+    fn test_filter_map_ok_hint() {
+        use std::str::FromStr;
 
-    assert_eq!(hint, (5, Some(5)));
-}
+        let hint = ["1", "2", "a", "4", "5"]
+            .iter()
+            .map(|txt| usize::from_str(txt))
+            .filter_map_ok(|i| Some(2 * i))
+            .size_hint();
 
-#[test]
-fn test_filter_map_err_hint() {
-    use std::str::FromStr;
+        assert_eq!(hint, (5, Some(5)));
+    }
 
-    let hint = ["1", "2", "a", "4", "5"]
-        .iter()
-        .map(|txt| usize::from_str(txt))
-        .filter_map_err(|e| Some(format!("{:?}", e)))
-        .size_hint();
+    #[test]
+    fn test_filter_map_err_hint() {
+        use std::str::FromStr;
 
-    assert_eq!(hint, (5, Some(5)));
+        let hint = ["1", "2", "a", "4", "5"]
+            .iter()
+            .map(|txt| usize::from_str(txt))
+            .filter_map_err(|e| Some(format!("{:?}", e)))
+            .size_hint();
+
+        assert_eq!(hint, (5, Some(5)));
+    }
 }
