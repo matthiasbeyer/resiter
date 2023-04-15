@@ -59,12 +59,15 @@ impl<I, O, E> Map<O, E> for I
 where
     I: Iterator<Item = Result<O, E>> + Sized,
 {
+    #[inline]
     fn map_ok<F, O2>(self, f: F) -> MapOk<Self, F>
     where
         F: FnMut(O) -> O2,
     {
         MapOk { iter: self, f }
     }
+
+    #[inline]
     fn map_err<F, E2>(self, f: F) -> MapErr<Self, F>
     where
         F: FnMut(E) -> E2,

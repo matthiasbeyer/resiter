@@ -49,12 +49,15 @@ impl<I, O, E> Filter<O, E> for I
 where
     I: Iterator<Item = Result<O, E>> + Sized,
 {
+    #[inline]
     fn filter_ok<F>(self, f: F) -> FilterOk<Self, F>
     where
         F: FnMut(&O) -> bool,
     {
         FilterOk { iter: self, f }
     }
+
+    #[inline]
     fn filter_err<F>(self, f: F) -> FilterErr<Self, F>
     where
         F: FnMut(&E) -> bool,

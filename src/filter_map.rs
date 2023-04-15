@@ -42,6 +42,7 @@ where
     /// assert_eq!(filter_mapped[4], Err("b"));
     /// assert_eq!(filter_mapped[5], Err("8"));
     /// ```
+    #[inline]
     fn filter_map_ok<F, O2>(self, f: F) -> FilterMapOk<Self, F>
     where
         F: FnMut(O) -> Option<O2>,
@@ -74,6 +75,7 @@ where
     /// assert_eq!(filter_mapped[4], Ok("5"));
     /// assert_eq!(filter_mapped[5], Err(8));
     /// ```
+    #[inline]
     fn filter_map_err<F, E2>(self, f: F) -> FilterMapErr<Self, F>
     where
         F: FnMut(E) -> Option<E2>,

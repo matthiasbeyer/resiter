@@ -40,6 +40,7 @@ where
     E: Sized,
     F: FnOnce() -> E,
 {
+    #[inline]
     fn inner_ok_or_else(self, f: F) -> Result<T, E> {
         self.and_then(|opt| opt.ok_or_else(f))
     }
@@ -94,6 +95,7 @@ where
     E: Sized,
     F: Fn() -> E,
 {
+    #[inline]
     fn map_inner_ok_or_else(self, f: F) -> IterInnerOkOrElseImpl<I, T, E, F> {
         IterInnerOkOrElseImpl(self, f)
     }

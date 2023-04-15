@@ -33,6 +33,7 @@ pub trait Process<T> {
 
 impl<I: Iterator> Process<I::Item> for I {
     /// Process all errors with a lambda
+    #[inline]
     fn process<R: Default, E, F>(self, f: F) -> Result<R, E>
     where
         F: Fn(I::Item) -> Result<R, E>,
