@@ -97,9 +97,9 @@ pub trait TryFilterMap<O, E>: Sized {
     ///     ]
     /// );
     /// ```
-    fn try_filter_map_err<F>(self, _: F) -> TryFilterMapErr<Self, F>
+    fn try_filter_map_err<F, E2>(self, _: F) -> TryFilterMapErr<Self, F>
     where
-        F: FnMut(E) -> Option<Result<O, E>>;
+        F: FnMut(E) -> Option<Result<O, E2>>;
 }
 
 impl<I, O, E> TryFilterMap<O, E> for I
@@ -114,9 +114,10 @@ where
         TryFilterMapOk { iter: self, f }
     }
 
-    fn try_filter_map_err<F>(self, f: F) -> TryFilterMapErr<Self, F>
+    #[inline]
+    fn try_filter_map_err<F, E2>(self, f: F) -> TryFilterMapErr<Self, F>
     where
-        F: FnMut(E) -> Option<Result<O, E>>,
+        F: FnMut(E) -> Option<Result<O, E2>>,
     {
         TryFilterMapErr { iter: self, f }
     }
@@ -160,12 +161,12 @@ pub struct TryFilterMapErr<I, F> {
     f: F,
 }
 
-impl<I, O, E, F> Iterator for TryFilterMapErr<I, F>
+impl<I, O, E, E2, F> Iterator for TryFilterMapErr<I, F>
 where
     I: Iterator<Item = Result<O, E>>,
-    F: FnMut(E) -> Option<Result<O, E>>,
+    F: FnMut(E) -> Option<Result<O, E2>>,
 {
-    type Item = Result<O, E>;
+    type Item = Result<O, E2>;
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {
@@ -174,7 +175,8 @@ where
                     Some(r) => Some(r),
                     None => continue,
                 },
-                v => v,
+                Some(Ok(x)) => Some(Ok(x)),
+                None => None,
             };
         }
     }
