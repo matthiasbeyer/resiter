@@ -208,6 +208,7 @@ pub use ok_or_else::{IterInnerOkOrElse, ResultOptionExt};
 pub use oks::GetOks;
 pub use onerr::OnErrDo;
 pub use onok::OnOkDo;
+pub use try_filter::TryFilter;
 pub use try_filter_map::TryFilterMap;
 pub use try_map::TryMap;
 pub use unwrap::UnwrapWithExt;
