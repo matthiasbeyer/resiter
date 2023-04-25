@@ -1,8 +1,10 @@
 # Changelog
 
 ## 0.5.0
-
-* More filters were added
+* new extensons were added for filtering and mapping over things that can fail
+    * `try_map_ok` and `try_map_err`
+    * `try_filter_ok` and `try_filter_err`
+    * `try_filter_map_ok` and `try_filter_map_err`
 * More examples were added
 * Doc tests were added
 
