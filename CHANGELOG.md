@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.5.0
+
+* New extensons were added for filtering and mapping over things that can fail
+    * `try_map_ok` and `try_map_err`
+    * `try_filter_ok` and `try_filter_err`
+    * `try_filter_map_ok` and `try_filter_map_err`
+* More examples were added
+* Doc tests were added
+
+For a detailed changelog, please have a look at the git log.
+
 ## 0.4.0
 
 * Add `map_inner_ok_or_else()` which can be used to transform:
