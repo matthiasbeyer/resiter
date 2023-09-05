@@ -20,7 +20,7 @@ jobs:
           # - nightly
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -46,7 +46,7 @@ jobs:
     continue-on-error: ${{ matrix.checks == 'advisories' }}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: cargo-deny
       uses: EmbarkStudios/cargo-deny-action@v1
       with:
@@ -59,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: 1.60.0
@@ -76,7 +76,7 @@ jobs:
     needs: check
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: cargo-doc
         uses: actions-rs/cargo@v1
         with:
@@ -96,7 +96,7 @@ jobs:
           # - nightly
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -114,7 +114,7 @@ jobs:
     name: clippy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: 1.60.0
